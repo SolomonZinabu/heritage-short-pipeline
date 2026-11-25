@@ -51,7 +51,7 @@ Edit one narration line in `storyboard.json` and run the film again. That line i
 
 ## What it costs
 
-The pipeline runs on free tiers. At Cloudflare's published tile prices a square 1280 pixel keyframe, with its reference images, comes to about $0.004. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
+The pipeline runs on free tiers. At Cloudflare's published tile prices a square 1280 pixel keyframe, with its reference images, comes to about $0.003. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
 
 ## Status
 

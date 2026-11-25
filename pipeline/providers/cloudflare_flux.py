@@ -44,7 +44,8 @@ def list_price_usd(
     """
     if model == KLEIN_4B:
         output = _tiles(width * height) * 0.000287
-        reference = _tiles(reference_pixels) * 0.000059
+        # Reference images are input tiles. With none, there is nothing to count.
+        reference = math.ceil(reference_pixels / (512 * 512)) * 0.000059
         return round(output + reference, 6)
     if model == KLEIN_9B:
         megapixels = width * height / 1_048_576
