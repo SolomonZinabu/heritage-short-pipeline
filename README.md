@@ -67,8 +67,8 @@ After creating an empty public repository, I can push this project from its fold
 ```bash
 git init
 git add .
-git commit -m "Start my Heritage Short project"
+git commit -m "initial commit with boiler-plate scaffolding"
 git branch -M main
-git remote add origin <YOUR_GITHUB_REPOSITORY_URL>
+git remote add origin https://github.com/SolomonZinabu/heritage-short-pipeline.git
 git push -u origin main
 ```
