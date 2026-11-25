@@ -18,11 +18,13 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "prompt", "seed"],
+        "required": ["id"],
         "properties": {
           "id": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"},
           "prompt": {"type": "string", "minLength": 1},
-          "seed": {"type": "integer"}
+          "seed": {"type": "integer"},
+          "file": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
         }
       }
     },
@@ -108,7 +110,7 @@
             "tail_seconds": {"type": "number", "minimum": 0, "maximum": 5},
             "end_card_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 10},
             "end_card_lines": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string", "minLength": 1}},
-            "fit": {"type": "string", "enum": ["cover", "blur"]},
+            "fit": {"type": "string", "enum": ["auto", "cover", "blur"]},
             "vertical": {"type": "array", "items": {"type": "integer", "minimum": 2}, "minItems": 2, "maxItems": 2},
             "horizontal": {"type": "array", "items": {"type": "integer", "minimum": 2}, "minItems": 2, "maxItems": 2},
             "music_gain": {"type": "number", "minimum": 0, "maximum": 4},
@@ -156,7 +158,37 @@
           "music_cue": {"type": "string", "minLength": 1},
           "reason": {"type": "string", "minLength": 1},
           "seed": {"type": "integer"},
-          "kenburns": {"type": "string", "enum": ["auto", "zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down", "none"]}
+          "cast": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"}
+          },
+          "kenburns": {"type": "string", "enum": ["auto", "zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down", "none"]},
+          "focus": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0, "maximum": 1},
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "stills": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["file"],
+              "properties": {
+                "file": {"type": "string", "minLength": 1},
+                "crop": {
+                  "type": "array",
+                  "items": {"type": "number", "minimum": 0, "maximum": 1},
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "seconds": {"type": "number", "exclusiveMinimum": 0}
+              }
+            }
+          }
         }
       }
     }
