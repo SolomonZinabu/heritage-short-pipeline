@@ -1,31 +1,28 @@
 {
-  "project_title": "TODO: film title",
-  "language": "TODO: narration language, for example Amharic",
-  "audience": "TODO: intended audience",
-  "intended_effect": "TODO: what viewers should feel or understand",
-  "visual_style": "TODO: the style block, in descriptive terms. It is added to every image prompt.",
-  "character_reference_prompt": "TODO: describe the recurring character or subject",
-  "references": [
-    {"id": "character", "prompt": "TODO: the recurring character on a plain background, as a reference sheet", "seed": 100},
-    {"id": "style", "prompt": "TODO: one sample frame that fixes the look of the film", "seed": 101}
-  ],
+  "project_title": "The Milk Mishap",
+  "language": "Amharic",
+  "audience": "My mother first, then family and friends who know the story, watching on their phones.",
+  "intended_effect": "She should laugh, recognise us both, and feel that this small morning is remembered with love.",
+  "visual_style": "Photorealistic live-action film still, shot on a 35mm cinema camera, in Ethiopia. The people are Ethiopian with Habesha features and dark brown skin, exactly as in the reference photos. Natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon.",
+  "character_reference_prompt": "People appear only when a shot names them in its cast.",
+  "references": [],
   "narration": {
-    "voice": "Sulafat",
-    "style": "warm and unhurried storytelling"
+    "voice": "Charon",
+    "style": ""
   },
   "music": {
-    "prompt": "TODO: describe the original instrumental score",
+    "prompt": "A light, playful instrumental: plucked krar, a soft flute melody and gentle hand percussion",
     "instrumental": true,
-    "mood": "TODO: score mood",
-    "bpm": 72,
-    "key": "TODO: musical key, for example D minor",
-    "duration_seconds": 80,
+    "mood": "sunny, warm and funny, like a family morning that goes wrong in the best way",
+    "bpm": 100,
+    "key": "G major",
+    "duration_seconds": 90,
     "candidates": 3,
     "seed": 7,
-    "chosen_index": 0
+    "chosen_index": 1
   },
   "end_card": {
-    "lines": ["Made with AI"],
+    "lines": ["Made with AI", "ይሄ ፊልም በሰው ሰራሽ አስተውሎት ተሰርቷል"],
     "seconds": 3
   },
   "settings": {
@@ -43,21 +40,21 @@
       "fps": 24,
       "lead_in_seconds": 0.25,
       "tail_seconds": 0.45,
-      "fit": "cover",
+      "fit": "auto",
       "vertical": [1080, 1920],
       "horizontal": [1920, 1080],
       "music_gain": 0.5,
-      "crf": 18
+      "crf": 22
     }
   },
   "shots": [
-    {"id":"shot_01","duration_seconds":7.5,"image_prompt":"TODO: opening image","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":101},
-    {"id":"shot_02","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":102},
-    {"id":"shot_03","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":103},
-    {"id":"shot_04","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":104},
-    {"id":"shot_05","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":105},
-    {"id":"shot_06","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":106},
-    {"id":"shot_07","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":107},
-    {"id":"shot_08","duration_seconds":7.5,"image_prompt":"TODO: closing image","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music resolves","reason":"TODO: why this shot belongs","seed":108}
+    {"id":"shot_01","duration_seconds":16,"kenburns":"zoom_in","stills":[{"file":"keyframes/shot_01.jpg","crop":[0,0,0.92,1],"seconds":8},{"file":"keyframes/shot_02.jpg","crop":[0,0,1,0.62],"seconds":8}],"image_prompt":"Wide view of rural home, exactly two cows, no people; then mother walking toward the two dairy cows with a metal milking basin. No spilled milk.","motion_prompt":"Wide view of the home, then the mother walking toward the cows. Natural cinematic motion, stable location.","narration":"አሁን የምነግራችሁ ታሪክ በልጅነቴ ከእናቴ ጋር የገጠመኝ አንድ አስቂኝ ገጠመኝ ነው። ያኔ የስድስት ዓመት ልጅ ነበርኩ። ገጠራማ አካባቢ ነበር የምንኖረው። ሁለት የሚታለቡ ላሞች ነበሩን። እናቴ በየቀኑ ማለዳ ተነስታ ታልባቸው ነበር።","subtitle_en":"I am going to tell you a funny incident from my childhood with my mother. I was six. We lived in a rural area. We had two dairy cows. My mother got up early every day to milk them.","music_cue":"Light, playful music starts under the first line and settles into a gentle groove","reason":"Sets the place and introduces the mother and the two cows before anything happens.","seed":201},
+    {"id":"shot_02","duration_seconds":7,"kenburns":"zoom_in","stills":[{"file":"keyframes/shot_03.jpg"}],"image_prompt":"Mother hand-milking one cow into a basin; boy watches with delight.","motion_prompt":"Mother hand-milking one cow into a basin; boy watches with delight. Natural cinematic motion, stable character identity and location.","narration":"እኔ ደግሞ እናቴ ላሞቹን ስታልብ ማየት እና ያለበችውን ትኩስ ወተት መጠጣት በጣም ያስደስተኝ ነበር።","subtitle_en":"I loved watching my mother milk the cows and drinking the fresh milk.","music_cue":"The music continues quietly","reason":"Shows the daily life the boy loved, so that the loss of the milk later matters.","seed":202},
+    {"id":"shot_03","duration_seconds":7,"kenburns":"pan_right","stills":[{"file":"keyframes/shot_04.jpg"}],"image_prompt":"Mother places full upright brown calabash gourd beside house doorway, dry ground.","motion_prompt":"Mother places full upright brown calabash gourd beside house doorway, dry ground. Natural cinematic motion, stable character identity and location.","narration":"ታዲያ አንድ ቀን ጠዋት እናቴ ያለበችውን ወተት በቅል ዕቃ ሞልታ በሩ አካባቢ አስቀምጣው ነበር።","subtitle_en":"One morning my mother filled a gourd with the milk and set it near the door.","music_cue":"The music continues quietly","reason":"Shows the gourd full and standing by the door: the thing that is about to be lost.","seed":203},
+    {"id":"shot_04","duration_seconds":13,"kenburns":"pan_left","stills":[{"file":"keyframes/shot_05.jpg","crop":[0,0,1,0.6],"seconds":6},{"file":"keyframes/shot_06.jpg","seconds":7}],"image_prompt":"Boy returns from playing with friends and runs toward house doorway; gourd upright. Then he accidentally bumps the calabash with his foot at the doorway, milk begins spilling.","motion_prompt":"The boy runs toward the doorway, then bumps the gourd with his foot and the milk begins spilling. Natural cinematic motion, stable character identity and location.","narration":"እኔም በጠዋት ከጓደኞቸ ጋር ትንሽ ተጫዉቸ ስጨርስ ወደ ቤት በሩጫ መጣሁ። ቤት ውስጥ ለመግባት ስል፣ በሩ አካባቢ የተቀመጠውን የወተት ቅል ሳላየው በእግሬ ገጭቼ ገለበጥኩት።","subtitle_en":"After playing with my friends that morning, I ran home. As I entered the house, I accidentally hit the milk gourd near the door with my foot and knocked it over.","music_cue":"The music lifts and quickens, then dips at the bump","reason":"The accident itself: the cause is shown, running in without looking, and then the bump.","seed":204},
+    {"id":"shot_05","duration_seconds":7,"kenburns":"pan_right","stills":[{"file":"keyframes/shot_07.jpg"}],"image_prompt":"Fallen gourd, milk on ground, shocked boy looks toward mother.","motion_prompt":"Fallen gourd, milk on ground, shocked boy looks toward mother. Natural cinematic motion, stable character identity and location.","narration":"ወተቱ አንድ ጠብታ ሳይቀር መሬት ላይ ፈሰሰ። እኔም ደንግጬ ወዲያው ወደ እናቴ ተመለከትኩ።","subtitle_en":"Every drop spilled onto the ground. Startled, I immediately looked at my mother.","music_cue":"Almost silence, for it to sink in","reason":"The damage, and the boy's first look at his mother. A pause that lets it sink in.","seed":205},
+    {"id":"shot_06","duration_seconds":7,"kenburns":"none","stills":[{"file":"keyframes/shot_08.jpg","seconds":3},{"file":"keyframes/shot_09.jpg","seconds":4}],"image_prompt":"Mother freezes in surprise, boy and spilled milk nearby; then a close-up as she exclaims Jesus of Nazareth.","motion_prompt":"The mother freezes in surprise, then the close-up as she exclaims. Natural cinematic motion, stable character identity.","narration":"እናቴ ሁሌም ስትደነግጥ የምትለው ነገር አላት። ያን ቀንም እንደተለመደው፣ «የናዝሬቱ ኢየሱስ!» ብላ ጮኸች።","subtitle_en":"My mother always has something she says when startled. That day, as usual, she shouted, “Jesus of Nazareth!”","music_cue":"The music holds its breath, then a short comic sting under the shout","reason":"The mother's reaction is the heart of the comedy, and the famous line is the payoff.","seed":206},
+    {"id":"shot_07","duration_seconds":16,"kenburns":"pan_left","stills":[{"file":"keyframes/shot_10.jpg","seconds":6},{"file":"keyframes/shot_10b.jpg","seconds":6},{"file":"keyframes/shot_11.jpg","seconds":5}],"image_prompt":"Mother checks the boy is unharmed; then she picks up a small stick and comes toward him; then he runs away, laughing, mother follows playfully, two cows watching. No striking.","motion_prompt":"The mother checks the boy, then comes toward him with a small stick, then he runs away laughing. Natural cinematic motion, stable character identity and location.","narration":"እናቴ እኔ አለመጎዳቴን ካረጋገጠች በኋላ ዱላ አንስታ ወደኔ መምጣት ጀመረች። ነገሩ ነገሩ ወዴት እያመራ እንደሆነ ሲገባኝ ። እኔም ተነስቸ እግሬ አውጪኝ ብዬ መሮጥ ጀመርኩ። ያን ቀን እንደሮጥኩት ሮጬ አላውቅም። ላሞቻችንም ቆመው ትርኢታችንን ይመለከቱ ነበር።","subtitle_en":"After making sure I was not hurt, she picked up a stick and came toward me. When I realized where things were going, I got up and ran for it. I had never run like I did that day. Even our cows stood watching the spectacle.","music_cue":"Bouncy music for the chase","reason":"She checks him first, which keeps it a comedy, and then the chase with the cows as deadpan witnesses.","seed":207},
+    {"id":"shot_08","duration_seconds":12,"kenburns":"zoom_in","stills":[{"file":"keyframes/shot_12.jpg"}],"image_prompt":"Mother and boy together, mother tells proverb, warm affectionate resolution.","motion_prompt":"Mother and boy together, warm affectionate resolution. Natural cinematic motion, stable character identity and location.","narration":"ያን ቀን ወተቱም ፈሰሰ እኔም እንደዛ የሮጥኩለትን ወተት ሳልጠጣ ዋልኩኝ። እናቴም \"የቸኮለች አፍስሳ ለቀመች\" ብላ የሁልዜ ተረቷን ተረትች ። ለእኔ እና ለናቴም እስከዛሬ ድረስ የሚያስቀን ትዝታ ሆኖ ቀረ። እማዬ፣ በጣም እወድሻለሁ!","subtitle_en":"The milk spilled, and I went the day without drinking the milk I had run for. My mother said her usual proverb about haste leading to spills and picking up the pieces. It remains a memory that makes us laugh even today. Mom, I love you so much!","music_cue":"The music resolves, warm and simple","reason":"Nobody is hurt, the morning ends in laughter and in love for the mother.","seed":208}
   ]
 }
