@@ -1,0 +1,23 @@
+{
+  "project_title": "TODO: film title",
+  "language": "TODO: narration language",
+  "audience": "TODO: intended audience",
+  "intended_effect": "TODO: what viewers should feel or understand",
+  "visual_style": "TODO: visual style in descriptive terms",
+  "character_reference_prompt": "TODO: describe the recurring character or subject",
+  "music": {
+    "prompt": "TODO: describe the original instrumental score",
+    "instrumental": true,
+    "mood": "TODO: score mood"
+  },
+  "shots": [
+    {"id":"shot_01","duration_seconds":7.5,"image_prompt":"TODO: opening image","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":101},
+    {"id":"shot_02","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":102},
+    {"id":"shot_03","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":103},
+    {"id":"shot_04","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":104},
+    {"id":"shot_05","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":105},
+    {"id":"shot_06","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":106},
+    {"id":"shot_07","duration_seconds":7.5,"image_prompt":"TODO: image description","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":107},
+    {"id":"shot_08","duration_seconds":7.5,"image_prompt":"TODO: closing image","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music resolves","reason":"TODO: why this shot belongs","seed":108}
+  ]
+}
