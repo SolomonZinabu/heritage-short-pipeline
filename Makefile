@@ -4,7 +4,7 @@
 #   .venv\Scripts\python -m pipeline film
 PYTHON ?= $(shell command -v python 2>/dev/null || command -v python3)
 
-.PHONY: help install validate-draft validate doctor smoke narration keyframes radio film
+.PHONY: help install validate-draft validate doctor smoke narration keyframes music radio film
 
 help: ## list the targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -33,5 +33,8 @@ keyframes: ## generate the reference sheet and the still for every shot
 radio: ## narration over a placeholder score, on a black screen
 	$(PYTHON) -m pipeline radio
 
-film: ## everything: narration, keyframes and the edit, in both aspect ratios
+music: ## reuse the score, or write the job that makes it on Kaggle
+	$(PYTHON) -m pipeline music
+
+film: ## everything: narration, keyframes, the score and the edit, in both aspect ratios
 	$(PYTHON) -m pipeline film

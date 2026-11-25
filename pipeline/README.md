@@ -9,7 +9,7 @@ calls a model. Each model call is one line in `runs.jsonl`.
 | Narration | `narration.py` | `shots[].narration`, `narration.voice`, `narration.style` | `outputs/narration/<shot>-<key>.wav` | the text, the voice, the style, the model |
 | Keyframes | `keyframes.py` | `references[]`, `visual_style`, `character_reference_prompt`, `shots[].image_prompt`, `shots[].seed` | `outputs/references/`, `outputs/keyframes/` | the prompt, the seed, the size, the steps, the model, the reference images |
 | Shots | not built | `shots[].motion_prompt` | `outputs/shots/` | the keyframe, the motion prompt, the seed |
-| Music | not built | `music` | `outputs/music/` | the prompt, the tempo, the key, the length, the seed |
+| Music | `music.py` | `music` | `outputs/music/`, and a job for Kaggle in `outputs/_jobs/music/` | the caption, the tempo, the key, the length, the seed |
 | Assembly | `assemble.py` | shot lengths, `end_card`, `settings.assembly` | `outputs/radio/`, `outputs/film/` | every input file, by hash |
 
 The shared code:

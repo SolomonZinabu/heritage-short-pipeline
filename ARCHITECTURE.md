@@ -11,7 +11,7 @@ storyboard.json  (checked against schema/storyboard.schema.json before every run
       | narration   | keyframes    | shots         | music          |
       | one spoken  | reference    | one video     | score          |
       | line per    | sheet, then  | per shot      | candidates     |
-      | shot        | one still    | (not built)   | (not built)    |
+      | shot        | one still    | (not built)   | on a free GPU  |
       | Gemini TTS  | FLUX on      | Wan 2.2 on    | ACE-Step on    |
       |             | Cloudflare   | Kaggle        | Kaggle         |
       +-------------+--------------+---------------+----------------+
@@ -29,10 +29,10 @@ storyboard.json  (checked against schema/storyboard.schema.json before every run
 | Narration | `python -m pipeline narration` | `narration` of each shot, the voice | `outputs/narration/<shot>-<key>.wav` | Gemini 3.8 Flash TTS |
 | Keyframes | `python -m pipeline keyframes` | `references`, then `image_prompt` of each shot with the style block | `outputs/references/`, `outputs/keyframes/` | FLUX.2 [klein] 4B on Cloudflare Workers AI |
 | Shots | not built | keyframe and `motion_prompt` | `outputs/shots/` | Wan 2.2 TI2V-5B on Kaggle |
-| Music | not built | `music` | `outputs/music/` | ACE-Step 1.5 on Kaggle |
+| Music | `python -m pipeline music`, then `python -m pipeline music import score.zip` | `music` | `outputs/music/` | ACE-Step 1.5 on Kaggle |
 | Assembly | `python -m pipeline film`, `python -m pipeline radio` | everything above | `outputs/film/`, `outputs/radio/` | none: FFmpeg only |
 
-`python -m pipeline film` runs narration, keyframes and assembly in that order. A shot that has no video yet is shown as its keyframe with a slow move, which the challenge allows as a fallback.
+`python -m pipeline film` runs narration, keyframes, music and assembly in that order. A shot that has no video yet is shown as its keyframe with a slow move, which the challenge allows as a fallback. A film whose score is not made yet uses a placeholder score.
 
 ## Timing comes from the narration
 
@@ -65,6 +65,8 @@ Mock runs (`--mock`) write to `outputs/_mock/`, call no model and log nothing, s
 | A shot's clip is shorter than the shot | Its last frame is held. |
 | A shot has no clip | Its keyframe is moved slowly instead. A shot with no keyframe is black. |
 | A font is missing | A clear error says which setting names the font file. |
+| A job on Kaggle stops | `score/progress.log` in its output holds the reason. The candidates already made are kept, and running it again continues from them. |
+| The bundle from Kaggle is incomplete | It is taken in only with a manifest that lists what was made, and each call in it is logged once. |
 
 ## Choices worth knowing
 
@@ -73,7 +75,16 @@ Mock runs (`--mock`) write to `outputs/_mock/`, call no model and log nothing, s
 - **Loudness in two passes.** The mix is measured, then normalised to -14 LUFS with a -1 dBTP ceiling, which is what YouTube and most platforms expect.
 - **The speech API takes no seed.** A narration line is made repeatable by keeping its file, not by a seed. The log says so on every narration line.
 
+## The score is made on Kaggle
+
+ACE-Step 1.5 needs a GPU that this machine does not have, so the music stage works in three steps.
+
+1. `python -m pipeline music` writes a job: a notebook that carries the job inside it, so nothing else has to be uploaded to Kaggle.
+2. On Kaggle, `kaggle/make_score.py` installs the model in a private environment, makes each candidate in a call of its own with its own seed, and packs the audio, a log of every call and a manifest into `score.zip`.
+3. `python -m pipeline music import score.zip` brings the audio into `outputs/music/` and adds Kaggle's calls to `runs.jsonl`, each of them once.
+
+The import was tested with a bundle made to look like Kaggle's. The job itself is written from the model's documentation and has not run on Kaggle yet. The first run is the test, and `kaggle/README.md` says what to do when it stops.
+
 ## Still to build
 
-- The shots stage on Kaggle (Wan 2.2), and the music stage on Kaggle (ACE-Step 1.5).
-- The two model clients have not yet been run against the live services. `python -m pipeline smoke` does that once and logs the result.
+- The shots stage on Kaggle (Wan 2.2). The official code wants 24 GB of GPU memory and a number format that the free T4 does not have, so a shot is shown as its keyframe with a slow move until that is settled.

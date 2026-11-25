@@ -29,6 +29,7 @@ A dry run that calls no model and spends nothing: `python -m pipeline film --moc
 | `python -m pipeline smoke` | Speaks one line and makes one image, and logs both. |
 | `python -m pipeline narration` | Speaks the line of every shot. |
 | `python -m pipeline keyframes` | Makes the reference sheet and the still of every shot. |
+| `python -m pipeline music` | Reuses the score, or writes the job that makes it on Kaggle. `music import score.zip` brings the result back. |
 | `python -m pipeline radio` | The radio cut: the narration over a placeholder score, on a black screen. |
 | `python -m pipeline film` | Narration, keyframes and the edit, in 9:16 and 16:9, with subtitles and the end card. |
 
@@ -45,6 +46,7 @@ Edit one narration line in `storyboard.json` and run the film again. That line i
 | `storyboard.json` | The contract: shots, durations, prompts, references, narration, music cues. |
 | `schema/storyboard.schema.json` | What a valid storyboard looks like. Checked before every run. |
 | `pipeline/` | One module per stage, the two model clients, and the shared cache, log and retry code. |
+| `kaggle/` | The job that makes the score on Kaggle, and how to run it. |
 | `runs.jsonl` | One line per model call: model, parameters, seed, latency, cost, and what came back. |
 | `outputs/` | Everything generated, kept so a run can be inspected. `outputs/manifest.json` says which file belongs to which shot. |
 | `ARCHITECTURE.md` | How the stages fit together, and how caching and failures are handled. |
@@ -55,6 +57,8 @@ The pipeline runs on free tiers. Cloudflare allows 10,000 Neurons a day free. A 
 
 ## Status
 
-Working, and tried end to end as a dry run: validation, narration, keyframes, the radio cut, and the film in both aspect ratios with subtitles and the end card.
+Working, and tried end to end as a dry run: validation, narration, keyframes, the radio cut, the music stage, and the film in both aspect ratios with subtitles and the end card. The two hosted models, Gemini TTS and FLUX, have each answered a real call.
 
-Not built yet: moving shots from Wan 2.2 and the score from ACE-Step 1.5, which both run on Kaggle. Until they are, a shot is shown as its keyframe with a slow move, and the film uses a placeholder score. The two model clients have not yet been run against the live services.
+Not yet run on Kaggle: the score job for ACE-Step 1.5. It is written, and the part that brings its results back is tested, but the job itself has not run there.
+
+Not built: moving shots from Wan 2.2. Until then a shot is shown as its keyframe with a slow move, and a film with no score yet uses a placeholder score.
