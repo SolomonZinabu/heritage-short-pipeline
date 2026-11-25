@@ -61,6 +61,31 @@ def gpu_name() -> str:
         return ""
 
 
+def clean_environment() -> dict[str, str]:
+    """The notebook's settings for its own Python, left out of the job's environment.
+
+    Kaggle's notebook runs one Python and tells the programs it starts how it
+    likes its plots, through ``MPLBACKEND``. The job runs in another Python,
+    where that plotting backend does not exist, and the model's library fell
+    over it the first time it was imported.
+    """
+    env = dict(os.environ)
+    for name in ("MPLBACKEND", "PYTHONPATH", "PYTHONUSERBASE", "PYTHONHOME", "PYTHONSTARTUP", "VIRTUAL_ENV"):
+        env.pop(name, None)
+    env["MPLBACKEND"] = "Agg"  # plotting without a screen, for whatever library imports it
+    return env
+
+
+def call(function, *arguments):
+    """Call with the arguments given, and ``None`` for any further argument the library insists on."""
+    required = [
+        parameter for parameter in inspect.signature(function).parameters.values()
+        if parameter.default is inspect.Parameter.empty
+        and parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+    ]
+    return function(*arguments, *([None] * max(0, len(required) - len(arguments))))
+
+
 def check(command: list[str], note: Progress, **options) -> int:
     """Run a setup command with its output shown, and note how it ended."""
     note("running: " + " ".join(str(part) for part in command[:6]))
@@ -115,9 +140,13 @@ def write_wav(path: Path, tensor, sample_rate: int) -> tuple[float, int]:
 def run_job(job: dict, out_dir: Path, note: Progress) -> int:
     """Make every candidate in the job, one call each, and log every call."""
     import torch
-    from acestep.handler import AceStepHandler
-    from acestep.inference import GenerationConfig, GenerationParams, generate_music
-    from acestep.llm_inference import LLMHandler
+    try:
+        from acestep.handler import AceStepHandler
+        from acestep.inference import GenerationConfig, GenerationParams, generate_music
+        from acestep.llm_inference import LLMHandler
+    except Exception as exc:
+        note(f"STOPPED: the model's library could not be imported: {type(exc).__name__}: {exc}")
+        raise
 
     session_file = out_dir / "session.json"
     session = json.loads(session_file.read_text(encoding="utf-8")) if session_file.exists() else {"started_at": time.time()}
@@ -140,7 +169,10 @@ def run_job(job: dict, out_dir: Path, note: Progress) -> int:
 
     handler = AceStepHandler()
     handler.initialize_service(
-        **accepted(AceStepHandler.initialize_service, project_root=os.getcwd(), config_path=job["tasks"][0]["model"], device="cuda")
+        **accepted(
+            AceStepHandler.initialize_service,
+            project_root=os.getcwd(), config_path=job["tasks"][0]["model"], device="cuda", offload_to_cpu=True,
+        )
     )
     # Not started: the score is made by the music model alone, from an exact caption.
     llm = LLMHandler()
@@ -189,7 +221,7 @@ def run_job(job: dict, out_dir: Path, note: Progress) -> int:
         torch.cuda.reset_peak_memory_stats()
         started = time.perf_counter()
         try:
-            result = generate_music(handler, llm, params, config)
+            result = call(generate_music, handler, llm, params, config)
             audio = result.audios[0]
             seconds, channels = write_wav(target, audio["tensor"], int(audio["sample_rate"]))
             record.update(
@@ -239,7 +271,7 @@ def setup(job: dict, job_file: Path, out_dir: Path, note: Progress) -> int:
         if check(["git", "clone", "--depth", "1", REPO, str(repo)], note):
             note("STOPPED: could not download the code")
             return 2
-    env = dict(os.environ)
+    env = clean_environment()
     env["UV_PROJECT_ENVIRONMENT"] = str(repo / ".venv")
     env["UV_CACHE_DIR"] = str(SCRATCH / "uv-cache")
     # ACE-Step ships ready-made parts for Python 3.11 only.

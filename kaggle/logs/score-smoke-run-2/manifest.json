@@ -1,0 +1,39 @@
+{
+  "gpu": "Tesla T4",
+  "session_seconds": 553,
+  "results": [
+    {
+      "id": "smoke",
+      "file": "smoke-score-e7b847f2f8.wav",
+      "task": {
+        "id": "smoke",
+        "model": "acestep-v15-turbo",
+        "caption": "soft solo piano, slow and warm, a little hopeful",
+        "bpm": 72,
+        "music_key": "C major",
+        "duration_seconds": 15,
+        "steps": 8,
+        "shift": 3.0,
+        "seed": 1,
+        "cache": "e7b847f2f83264c6aa90e0d34f0c668ddab1d67ee8e5bb5ba3aa03c28d8551fd",
+        "file": "smoke-score-e7b847f2f8.wav"
+      },
+      "seconds": 15.0
+    }
+  ],
+  "tasks": [
+    {
+      "id": "smoke",
+      "model": "acestep-v15-turbo",
+      "caption": "soft solo piano, slow and warm, a little hopeful",
+      "bpm": 72,
+      "music_key": "C major",
+      "duration_seconds": 15,
+      "steps": 8,
+      "shift": 3.0,
+      "seed": 1,
+      "cache": "e7b847f2f83264c6aa90e0d34f0c668ddab1d67ee8e5bb5ba3aa03c28d8551fd",
+      "file": "smoke-score-e7b847f2f8.wav"
+    }
+  ]
+}

@@ -14,6 +14,18 @@ from ..providers import ProviderError, post
 
 INTERACTIONS_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 
+# Google's published paid-tier price for this model, in use until 31 December 2026.
+AUDIO_TOKENS_PER_SECOND = 25
+AUDIO_USD_PER_MILLION_TOKENS = 9.00
+
+
+def list_price_usd(seconds: float) -> float:
+    """What this much speech would have cost on the paid tier.
+
+    The spoken words are a negligible part of it, so only the audio is counted.
+    """
+    return round(seconds * AUDIO_TOKENS_PER_SECOND * AUDIO_USD_PER_MILLION_TOKENS / 1_000_000, 6)
+
 
 def request_payload(*, model: str, text: str, voice: str, style: str) -> dict[str, Any]:
     """The body of one request.

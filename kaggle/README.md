@@ -50,7 +50,22 @@ Open `score/progress.log` in Kaggle's output panel. The reason is at its end.
 The script also prints the names the library accepts for its settings, so a
 mismatch can be seen at once.
 
-## Not yet tried
+## The record of each run
 
-The score job is written from the model's documentation and has not been run on
-Kaggle yet. The first run is the test.
+The output of each run on Kaggle is kept in `logs/`, so that a failure can
+still be read after the page is closed. `FAILURES.md` refers to these files as
+evidence. `score-smoke-run-1.txt` is the first run of the 15-second test.
+`score-smoke-run-2/` holds the log, the manifest and the session of the second.
+
+## How it went
+
+The job has run on Kaggle twice, in one session, as the 15-second test. The
+first run stopped on a setting the notebook passes to the programs it starts.
+The second made the music. On a T4, 15 seconds of music took 10.7 seconds, with
+5.6 GB of GPU memory at its peak.
+
+The music lasts about 12 seconds and the last 3 seconds are silent. The
+model's documentation calls 30 to 60 seconds the stable length, so the real
+score is asked for at that length or longer, and its end is measured.
+
+The real score has not been made yet.
