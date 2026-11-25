@@ -51,7 +51,7 @@ Edit one narration line in `storyboard.json` and run the film again. That line i
 
 ## What it costs
 
-The pipeline runs on free tiers. At Cloudflare's published tile prices a square 1280 pixel keyframe, with its reference images, comes to about $0.003. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
+The pipeline runs on free tiers. Cloudflare allows 10,000 Neurons a day free. A square 1280 pixel keyframe with two reference images uses about 330 of them, so a whole film's keyframes use about 3,800. On Cloudflare's paid plan that keyframe would cost about $0.004. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
 
 ## Status
 

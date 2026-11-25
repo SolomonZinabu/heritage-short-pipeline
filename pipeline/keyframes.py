@@ -48,7 +48,7 @@ def generate(
     """Call the model until an attempt succeeds, then keep the image under its cache key."""
     account_id = private("CLOUDFLARE_ACCOUNT_ID")
     api_token = private("CLOUDFLARE_API_TOKEN")
-    reference_pixels = sum(_image_size(path)[0] * _image_size(path)[1] for path in references)
+    reference_sizes = [_image_size(path) for path in references]
 
     def attempt(number: int) -> Path:
         with logged_call(
@@ -75,8 +75,9 @@ def generate(
                 output=cache.relative(path),
                 output_sha256=cache.file_hash(path),
                 output_size=_image_size(path),
+                neurons=cloudflare_flux.neurons(inputs["model"], inputs["width"], inputs["height"], reference_sizes),
                 list_price_usd=cloudflare_flux.list_price_usd(
-                    inputs["model"], inputs["width"], inputs["height"], reference_pixels
+                    inputs["model"], inputs["width"], inputs["height"], reference_sizes
                 ),
             )
         return path

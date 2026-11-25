@@ -1,7 +1,8 @@
 """Keyframes with FLUX on Cloudflare Workers AI, over its REST API.
 
-The image comes back as base64 inside JSON. Its published prices are here too,
-so every call can record what it would have cost at list price.
+The image comes back as base64 inside JSON. Cloudflare's published prices are
+here too, so every call can record what it used and what it would have cost on
+the paid plan.
 """
 from __future__ import annotations
 
@@ -15,6 +16,13 @@ ACCOUNT_URL = "https://api.cloudflare.com/client/v4/accounts"
 
 KLEIN_4B = "@cf/black-forest-labs/flux-2-klein-4b"
 KLEIN_9B = "@cf/black-forest-labs/flux-2-klein-9b"
+
+# Cloudflare measures use in Neurons. A picture counts as a grid of tiles.
+TILE = 512
+FREE_NEURONS_PER_DAY = 10_000
+OUTPUT_TILE_NEURONS = {KLEIN_4B: 26.05}
+INPUT_TILE_NEURONS = {KLEIN_4B: 5.37}
+NEURON_USD = 0.011 / 1000  # the price of one Neuron on the paid plan
 
 # How each model's bytes reveal their format.
 _SIGNATURES = (
@@ -30,28 +38,35 @@ def image_suffix(image: bytes) -> str:
     return ".webp" if image[8:12] == b"WEBP" else ".jpg"
 
 
-def _tiles(pixels: int) -> int:
-    return max(1, math.ceil(pixels / (512 * 512)))
+def _tiles(width: int, height: int) -> int:
+    return max(1, math.ceil(width / TILE)) * max(1, math.ceil(height / TILE))
+
+
+def neurons(
+    model: str, width: int, height: int, reference_sizes: list[tuple[int, int]] | None = None
+) -> float | None:
+    """How much of the day's free allowance one call uses, or None when that is not known here."""
+    if model == KLEIN_4B:
+        used = _tiles(width, height) * OUTPUT_TILE_NEURONS[model]
+        used += sum(_tiles(w, h) * INPUT_TILE_NEURONS[model] for w, h in reference_sizes or [])
+        return round(used, 2)
+    if model == KLEIN_9B:
+        megapixels = width * height / 1_048_576
+        used = 1363.64 + max(0.0, megapixels - 1) * 181.82
+        used += sum(w * h / 1_048_576 * 181.82 for w, h in reference_sizes or [])
+        return round(used, 2)
+    return None
 
 
 def list_price_usd(
-    model: str, width: int, height: int, reference_pixels: int = 0
+    model: str, width: int, height: int, reference_sizes: list[tuple[int, int]] | None = None
 ) -> float | None:
-    """What one call would cost at list price, or None when the price is not known here.
+    """What one call would cost on the paid plan, or None when the price is not known here.
 
-    Free allowance is not taken into account. The prices are the ones
-    Cloudflare publishes per 512 by 512 tile.
+    The free allowance is not taken into account.
     """
-    if model == KLEIN_4B:
-        output = _tiles(width * height) * 0.000287
-        # Reference images are input tiles. With none, there is nothing to count.
-        reference = math.ceil(reference_pixels / (512 * 512)) * 0.000059
-        return round(output + reference, 6)
-    if model == KLEIN_9B:
-        megapixels = width * height / 1_048_576
-        output = 0.015 + max(0.0, megapixels - 1) * 0.002
-        return round(output + reference_pixels / 1_048_576 * 0.002, 6)
-    return None
+    used = neurons(model, width, height, reference_sizes)
+    return None if used is None else round(used * NEURON_USD, 6)
 
 
 def generate_image(
