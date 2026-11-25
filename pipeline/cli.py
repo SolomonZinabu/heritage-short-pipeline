@@ -6,25 +6,25 @@ and writes the film in both aspect ratios.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
-from typing import Any, Callable
+from pathlib import Path
+from typing import Any
 
-from . import assemble, config, ffmpeg, keyframes, narration, smoke
+from . import assemble, cache, config, ffmpeg, keyframes, music, narration, smoke
 from .providers import ProviderError
 from .runlog import redact
 from .util import say
 from .validate_storyboard import SCHEMA, STORYBOARD, check_storyboard, load_storyboard
 
 
-def _stage_options(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--only", help="work on these shots only, for example shot_03,shot_07")
-    parser.add_argument("--force", action="store_true", help="make everything again, even what is already made")
+def _mock_option(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--mock", action="store_true", help="dry run: stand-ins instead of models, no calls, nothing logged")
 
 
-def _load(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
+def _load(args: argparse.Namespace, *, allow_draft: bool = False) -> tuple[dict[str, Any], dict[str, Any]]:
     """Every command starts the same way: the storyboard is checked, then its settings are filled in."""
-    storyboard = load_storyboard(allow_draft=args.mock)
+    storyboard = load_storyboard(allow_draft=args.mock or allow_draft)
     settings = config.merge_settings(storyboard.get("settings"))
     if args.mock:
         say("MOCK RUN: stand-ins instead of models. Nothing is logged to runs.jsonl.")
@@ -32,8 +32,6 @@ def _load(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
-    import json
-
     storyboard = json.loads(STORYBOARD.read_text(encoding="utf-8"))
     errors, todos, total = check_storyboard(storyboard, json.loads(SCHEMA.read_text(encoding="utf-8")), allow_draft=args.allow_draft)
     for error in errors:
@@ -56,12 +54,26 @@ def cmd_keyframes(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_music(args: argparse.Namespace) -> int:
+    if args.action == "import":
+        if not args.source:
+            raise SystemExit("Name the file to import. For example: python -m pipeline music import score.zip")
+        music.import_results(Path(args.source))
+        return 0
+    # The short test does not use the storyboard, so it can be written while the storyboard is still a draft.
+    storyboard, settings = _load(args, allow_draft=args.smoke)
+    if args.action == "export":
+        say(f"The job for Kaggle is written: {cache.relative(music.export(storyboard, settings, smoke=args.smoke))}")
+        return 0
+    return 0 if music.run(storyboard, settings, mock=args.mock) else 1
+
+
 def cmd_radio(args: argparse.Namespace) -> int:
     storyboard, settings = _load(args)
     voices = narration.run(storyboard, settings, force=args.force, mock=args.mock)
     say("")
     out = assemble.radio_cut(storyboard, settings, narration=voices, force=args.force, mock=args.mock)
-    say(f"Radio cut: {cache_relative(out)}  {ffmpeg.duration_seconds(out):.2f}s")
+    say(f"Radio cut: {cache.relative(out)}  {ffmpeg.duration_seconds(out):.2f}s")
     return 0
 
 
@@ -71,14 +83,10 @@ def cmd_film(args: argparse.Namespace) -> int:
     say("")
     stills = keyframes.run(storyboard, settings, force=args.force, mock=args.mock)
     say("")
-    made = assemble.film(storyboard, settings, narration=voices, keyframes=stills, force=args.force, mock=args.mock)
+    score = music.run(storyboard, settings, mock=args.mock)
+    say("")
+    assemble.film(storyboard, settings, narration=voices, keyframes=stills, music=score, force=args.force, mock=args.mock)
     return 0
-
-
-def cache_relative(path) -> str:
-    from . import cache
-
-    return cache.relative(path)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -95,15 +103,28 @@ def build_parser() -> argparse.ArgumentParser:
     for name, help_text, handler in (
         ("narration", "speak the line of every shot", cmd_narration),
         ("keyframes", "make the reference sheet and the still of every shot", cmd_keyframes),
-        ("radio", "narration over a placeholder score, on a black screen", cmd_radio),
     ):
         stage = commands.add_parser(name, help=help_text)
-        _stage_options(stage)
+        stage.add_argument("--only", help="work on these shots only, for example shot_03,shot_07")
+        stage.add_argument("--force", action="store_true", help="make everything again, even what is already made")
+        _mock_option(stage)
         stage.set_defaults(handler=handler)
 
-    film = commands.add_parser("film", help="everything: narration, keyframes and the edit, in both aspect ratios")
+    score = commands.add_parser("music", help="the score: reuse it, or write the job that makes it on Kaggle")
+    score.add_argument("action", nargs="?", default="make", choices=["make", "export", "import"])
+    score.add_argument("source", nargs="?", help="for import: the score.zip downloaded from Kaggle")
+    score.add_argument("--smoke", action="store_true", help="with export: a 15-second test instead of the real score")
+    _mock_option(score)
+    score.set_defaults(handler=cmd_music)
+
+    radio = commands.add_parser("radio", help="narration over a placeholder score, on a black screen")
+    radio.add_argument("--force", action="store_true", help="make everything again, even what is already made")
+    _mock_option(radio)
+    radio.set_defaults(handler=cmd_radio)
+
+    film = commands.add_parser("film", help="everything: narration, keyframes, the score and the edit, in both aspect ratios")
     film.add_argument("--force", action="store_true", help="make everything again, even what is already made")
-    film.add_argument("--mock", action="store_true", help="dry run: stand-ins instead of models, no calls, nothing logged")
+    _mock_option(film)
     film.set_defaults(handler=cmd_film)
     return parser
 

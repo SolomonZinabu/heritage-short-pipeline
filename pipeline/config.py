@@ -83,6 +83,11 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "voice": "Sulafat",
         "style": "warm and unhurried storytelling",
     },
+    "music": {
+        "model": "acestep-v15-turbo",
+        "steps": 8,
+        "shift": 3.0,
+    },
     "assembly": {
         "fps": 24,
         "lead_in_seconds": 0.25,

@@ -90,6 +90,15 @@
             "style": {"type": "string"}
           }
         },
+        "music": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {"type": "string", "minLength": 1},
+            "steps": {"type": "integer", "minimum": 1, "maximum": 50},
+            "shift": {"type": "number"}
+          }
+        },
         "assembly": {
           "type": "object",
           "additionalProperties": false,
