@@ -12,6 +12,29 @@
     "intended_effect": {"type": "string", "minLength": 1},
     "visual_style": {"type": "string", "minLength": 1},
     "character_reference_prompt": {"type": "string", "minLength": 1},
+    "references": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "prompt", "seed"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"},
+          "prompt": {"type": "string", "minLength": 1},
+          "seed": {"type": "integer"}
+        }
+      }
+    },
+    "narration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["voice"],
+      "properties": {
+        "voice": {"type": "string", "minLength": 1},
+        "style": {"type": "string"}
+      }
+    },
     "music": {
       "type": "object",
       "additionalProperties": false,
@@ -19,7 +42,100 @@
       "properties": {
         "prompt": {"type": "string", "minLength": 1},
         "instrumental": {"type": "boolean"},
-        "mood": {"type": "string", "minLength": 1}
+        "mood": {"type": "string", "minLength": 1},
+        "bpm": {"type": "integer", "minimum": 40, "maximum": 220},
+        "key": {"type": "string"},
+        "duration_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 240},
+        "candidates": {"type": "integer", "minimum": 1, "maximum": 8},
+        "seed": {"type": "integer"},
+        "chosen_index": {"type": "integer", "minimum": 0}
+      }
+    },
+    "end_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lines", "seconds"],
+      "properties": {
+        "lines": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string", "minLength": 1}},
+        "seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 10}
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "retries": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"attempts": {"type": "integer", "minimum": 1, "maximum": 10}}
+        },
+        "keyframes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {"type": "string", "minLength": 1},
+            "width": {"type": "integer", "minimum": 256, "maximum": 2048},
+            "height": {"type": "integer", "minimum": 256, "maximum": 2048},
+            "steps": {"type": "integer", "minimum": 1, "maximum": 50},
+            "send_seed": {"type": "boolean"},
+            "use_references": {"type": "boolean"}
+          }
+        },
+        "narration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {"type": "string", "minLength": 1},
+            "voice": {"type": "string", "minLength": 1},
+            "style": {"type": "string"}
+          }
+        },
+        "music": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {"type": "string", "minLength": 1},
+            "steps": {"type": "integer", "minimum": 1, "maximum": 50},
+            "shift": {"type": "number"}
+          }
+        },
+        "assembly": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "fps": {"type": "integer", "minimum": 12, "maximum": 60},
+            "lead_in_seconds": {"type": "number", "minimum": 0, "maximum": 5},
+            "tail_seconds": {"type": "number", "minimum": 0, "maximum": 5},
+            "end_card_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 10},
+            "end_card_lines": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string", "minLength": 1}},
+            "fit": {"type": "string", "enum": ["cover", "blur"]},
+            "vertical": {"type": "array", "items": {"type": "integer", "minimum": 2}, "minItems": 2, "maxItems": 2},
+            "horizontal": {"type": "array", "items": {"type": "integer", "minimum": 2}, "minItems": 2, "maxItems": 2},
+            "music_gain": {"type": "number", "minimum": 0, "maximum": 4},
+            "crf": {"type": "integer", "minimum": 0, "maximum": 51},
+            "duck": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {"type": "number", "exclusiveMinimum": 0},
+                "ratio": {"type": "number", "exclusiveMinimum": 0},
+                "attack": {"type": "integer", "minimum": 0},
+                "release": {"type": "integer", "minimum": 0}
+              }
+            },
+            "loudness": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "i": {"type": "number"},
+                "tp": {"type": "number"},
+                "lra": {"type": "number"}
+              }
+            },
+            "subtitle_font": {"type": "string"},
+            "end_card_font": {"type": "string"}
+          }
+        }
       }
     },
     "shots": {
@@ -39,7 +155,8 @@
           "subtitle_en": {"type": "string", "minLength": 1},
           "music_cue": {"type": "string", "minLength": 1},
           "reason": {"type": "string", "minLength": 1},
-          "seed": {"type": "integer"}
+          "seed": {"type": "integer"},
+          "kenburns": {"type": "string", "enum": ["auto", "zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down", "none"]}
         }
       }
     }

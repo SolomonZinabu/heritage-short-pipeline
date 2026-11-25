@@ -1,14 +1,54 @@
 {
   "project_title": "TODO: film title",
-  "language": "TODO: narration language",
+  "language": "TODO: narration language, for example Amharic",
   "audience": "TODO: intended audience",
   "intended_effect": "TODO: what viewers should feel or understand",
-  "visual_style": "TODO: visual style in descriptive terms",
+  "visual_style": "TODO: the style block, in descriptive terms. It is added to every image prompt.",
   "character_reference_prompt": "TODO: describe the recurring character or subject",
+  "references": [
+    {"id": "character", "prompt": "TODO: the recurring character on a plain background, as a reference sheet", "seed": 100},
+    {"id": "style", "prompt": "TODO: one sample frame that fixes the look of the film", "seed": 101}
+  ],
+  "narration": {
+    "voice": "Sulafat",
+    "style": "warm and unhurried storytelling"
+  },
   "music": {
     "prompt": "TODO: describe the original instrumental score",
     "instrumental": true,
-    "mood": "TODO: score mood"
+    "mood": "TODO: score mood",
+    "bpm": 72,
+    "key": "TODO: musical key, for example D minor",
+    "duration_seconds": 80,
+    "candidates": 3,
+    "seed": 7,
+    "chosen_index": 0
+  },
+  "end_card": {
+    "lines": ["Made with AI"],
+    "seconds": 3
+  },
+  "settings": {
+    "retries": {"attempts": 4},
+    "keyframes": {
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "width": 1280,
+      "height": 1280,
+      "steps": 8,
+      "send_seed": true,
+      "use_references": true
+    },
+    "narration": {"model": "gemini-3.8-flash-tts"},
+    "assembly": {
+      "fps": 24,
+      "lead_in_seconds": 0.25,
+      "tail_seconds": 0.45,
+      "fit": "cover",
+      "vertical": [1080, 1920],
+      "horizontal": [1920, 1080],
+      "music_gain": 0.5,
+      "crf": 18
+    }
   },
   "shots": [
     {"id":"shot_01","duration_seconds":7.5,"image_prompt":"TODO: opening image","motion_prompt":"TODO: one camera or subject movement","narration":"TODO: narration line","subtitle_en":"TODO: English subtitle","music_cue":"TODO: music at this point","reason":"TODO: why this shot belongs","seed":101},
