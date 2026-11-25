@@ -11,6 +11,7 @@ from typing import Any, Callable
 
 from . import assemble, config, ffmpeg, keyframes, narration, smoke
 from .providers import ProviderError
+from .runlog import redact
 from .util import say
 from .validate_storyboard import SCHEMA, STORYBOARD, check_storyboard, load_storyboard
 
@@ -120,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.handler(args)
     except (config.MissingSetting, ffmpeg.FFmpegError, ProviderError) as exc:
-        say(f"Stopped: {exc}")
+        say(f"Stopped: {redact(str(exc))}")
         return 2
     except KeyboardInterrupt:
         say("Interrupted.")

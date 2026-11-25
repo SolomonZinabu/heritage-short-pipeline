@@ -27,8 +27,8 @@ def log_model_call(record: dict[str, Any], path: Path = RUNS) -> None:
         stream.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
 
-def _redact(text: str) -> str:
-    """Mask a private value if one leaked into an error message."""
+def redact(text: str) -> str:
+    """Mask a private value if one leaked into a message."""
     load_env()
     for name in PRIVATE_NAMES:
         value = os.environ.get(name, "")
@@ -70,7 +70,7 @@ def logged_call(
         yield record
     except Exception as exc:
         record["status"] = "error"
-        record["error"] = _redact(f"{type(exc).__name__}: {exc}")[:600]
+        record["error"] = redact(f"{type(exc).__name__}: {exc}")[:600]
         raise
     finally:
         record["latency_seconds"] = round(time.perf_counter() - started, 3)

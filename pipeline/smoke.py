@@ -13,7 +13,7 @@ from pathlib import Path
 
 from . import cache, config, ffmpeg, media
 from .providers import cloudflare_flux, gemini_tts
-from .runlog import logged_call
+from .runlog import logged_call, redact
 from .util import say
 from .validate_storyboard import check_storyboard
 
@@ -131,8 +131,8 @@ def _report(attempt, folder: Path, settings: dict) -> bool:
     """Run one attempt and say how it went. Returns True when it failed."""
     try:
         message, record = attempt(folder, settings)
-    except Exception as exc:  # The failure is already logged; show it without a traceback.
-        say(f"  FAILED: {type(exc).__name__}: {exc}")
+    except Exception as exc:  # The failure is already logged; show it without a traceback, and without any private value.
+        say(f"  FAILED: {redact(f'{type(exc).__name__}: {exc}')}")
         return True
     say(f"  {message}  in {record['latency_seconds']:.1f}s")
     return False
