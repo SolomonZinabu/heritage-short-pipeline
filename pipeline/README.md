@@ -1,11 +1,24 @@
 # Pipeline stage contracts
 
-Planned stages, all driven by storyboard.json:
+Every stage is one module, run as `python -m pipeline <stage>`. Each one checks
+`storyboard.json` first, looks for the outputs it already made, and only then
+calls a model. Each model call is one line in `runs.jsonl`.
 
-1. `keyframes`: reference sheet and per-shot stills; cache by prompt, seed, model, parameters, and reference hashes.
-2. `shots`: image-to-video clips or documented still-animation fallback.
-3. `music`: generate/audition score candidates and record the selected candidate.
-4. `narration`: render narration per shot and align English subtitles.
-5. `assemble`: produce 9:16 and 16:9 MP4s, mix/duck audio, and add the AI end card.
+| Stage | Module | Reads from the storyboard | Writes | Reuses when unchanged |
+|---|---|---|---|---|
+| Narration | `narration.py` | `shots[].narration`, `narration.voice`, `narration.style` | `outputs/narration/<shot>-<key>.wav` | the text, the voice, the style, the model |
+| Keyframes | `keyframes.py` | `references[]`, `visual_style`, `character_reference_prompt`, `shots[].image_prompt`, `shots[].seed` | `outputs/references/`, `outputs/keyframes/` | the prompt, the seed, the size, the steps, the model, the reference images |
+| Shots | not built | `shots[].motion_prompt` | `outputs/shots/` | the keyframe, the motion prompt, the seed |
+| Music | not built | `music` | `outputs/music/` | the prompt, the tempo, the key, the length, the seed |
+| Assembly | `assemble.py` | shot lengths, `end_card`, `settings.assembly` | `outputs/radio/`, `outputs/film/` | every input file, by hash |
 
-These providers and stage scripts are not wired yet. Do not describe the starter as an end-to-end pipeline until the stages are implemented and the outputs are regenerated from a clean clone.
+The shared code:
+
+- `validate_storyboard.py` checks the storyboard. `load_storyboard` is what the stages call.
+- `cache.py` makes the keys and keeps `outputs/manifest.json`.
+- `runlog.py` writes `runs.jsonl`, including failed calls.
+- `retry.py` retries the failures that may go away.
+- `timeline.py` works out when each shot starts and how long it stays.
+- `subtitles.py` draws the subtitles and the end card.
+- `providers/` holds the two model clients, one file each.
+- `smoke.py` holds `doctor` and `smoke`.

@@ -1,74 +1,60 @@
 # The Heritage Short
 
-This is my project for 10 Academy’s Heritage Short challenge. I’m building a small, repeatable workflow that can turn a story that matters to me and my family into a short film.
+A 60 to 90 second short film that one file describes. `storyboard.json` lists every shot: its picture, its movement, the line spoken over it and the English subtitle. The pipeline in `pipeline/` turns that file into narration, keyframes and a finished film in two aspect ratios.
 
-I want to bring the parts of the process together in code: planning the shots, creating images and video, generating narration and music, and assembling the final edit. I’ll use audience feedback to improve the story, and I’ll keep notes on what works and what I learn along the way.
+## Run it
 
-## Where I am now
+You need Python 3.10 or newer and nothing else. FFmpeg comes with the Python packages.
 
-I’ve set up the project structure, drafted the storyboard schema, and added a placeholder storyboard with eight shots. I’ve also written helpers to check the storyboard, create stable cache keys, and record model calls.
-
-The storyboard is still a template: I have not yet filled in the story, audience, language, or prompts. The image, video, music, and narration generation stages, as well as final film assembly, are work I’ll add as I build and test the pipeline.
-
-## Getting started
-
-You’ll need Python 3.10 or newer.
-
-Install the dependencies:
-
-```bash
+```
 python -m pip install -r requirements.txt
 ```
 
-Check the placeholder storyboard structure:
+Copy `.env.example` to `.env` and fill in the three values: a Gemini API key, and a Cloudflare account ID and API token. The pipeline never prints them and Git ignores the file.
 
-```bash
-python pipeline/validate_storyboard.py --allow-draft
+```
+python -m pipeline doctor    # what is ready and what is missing
+python -m pipeline smoke     # one small call to each service, logged
+python -m pipeline film      # everything, in outputs/film/
 ```
 
-Once I’ve filled in the storyboard, run the full validation:
+A dry run that calls no model and spends nothing: `python -m pipeline film --mock`.
 
-```bash
-python pipeline/validate_storyboard.py
-```
+## Commands
 
-The second command checks that the storyboard has no TODO placeholders and that the planned shots add up to 60–90 seconds. The Makefile also provides `make validate-draft` and `make validate` shortcuts.
+| Command | What it does |
+|---|---|
+| `python -m pipeline validate` | Checks the storyboard against its schema and the 60 to 90 second rule. `--allow-draft` allows TODOs. |
+| `python -m pipeline doctor` | Checks the packages, FFmpeg, which private values are set, and the storyboard. |
+| `python -m pipeline smoke` | Speaks one line and makes one image, and logs both. |
+| `python -m pipeline narration` | Speaks the line of every shot. |
+| `python -m pipeline keyframes` | Makes the reference sheet and the still of every shot. |
+| `python -m pipeline radio` | The radio cut: the narration over a placeholder score, on a black screen. |
+| `python -m pipeline film` | Narration, keyframes and the edit, in 9:16 and 16:9, with subtitles and the end card. |
 
-## How I’m organizing the project
+Every stage takes `--force` to make things again and `--mock` for a dry run. Narration and keyframes also take `--only shot_03,shot_07` to work on some shots.
 
-- `storyboard.json` is the plan that the pipeline stages will use.
-- `schema/storyboard.schema.json` defines the storyboard structure.
-- `pipeline/` contains the validation and helper code. I’ll add the generation and assembly stages here.
-- `runs.jsonl` will record each model call, including its model, parameters, seed, latency, and cost.
-- `outputs/` is where generated images, audio, and video will go.
-- `DESIGN.md` is where I’ll record the audience, intent, and feedback from both viewer tests.
-- `ARCHITECTURE.md` will describe how the stages, caching, and failure handling work.
-- `EXPERIMENTS.md`, `FAILURES.md`, and `COSTS.md` will document my experiments, blockers, and measurements.
-- `ETHICS.md` will record consent, model terms, and the film’s AI labelling.
+## Change one thing, and only that is made again
 
-## What I’ll do next
+Edit one narration line in `storyboard.json` and run the film again. That line is spoken again. The other lines, the keyframes and everything else are reused, because every generated file is named after a hash of its inputs. `runs.jsonl` gains exactly one line.
 
-1. Choose the story, audience, language, and the feeling or understanding I want viewers to leave with.
-2. Replace the TODO fields in `storyboard.json` with 8–12 planned shots, totaling 60–90 seconds.
-3. Make a narration-only radio cut and ask at least three people from my intended audience for feedback.
-4. Use that feedback to revise the storyboard, then build and test each generation stage.
-5. Show a near-final cut to at least three audience members, record their feedback, and finish both video formats.
+## Where things are
 
-The final goal is for someone to clone the repository and use one documented command to regenerate the film. I’ll add that command once the generation and assembly stages are working.
+| Path | What it holds |
+|---|---|
+| `storyboard.json` | The contract: shots, durations, prompts, references, narration, music cues. |
+| `schema/storyboard.schema.json` | What a valid storyboard looks like. Checked before every run. |
+| `pipeline/` | One module per stage, the two model clients, and the shared cache, log and retry code. |
+| `runs.jsonl` | One line per model call: model, parameters, seed, latency, cost, and what came back. |
+| `outputs/` | Everything generated, kept so a run can be inspected. `outputs/manifest.json` says which file belongs to which shot. |
+| `ARCHITECTURE.md` | How the stages fit together, and how caching and failures are handled. |
 
-## Ethics and secrets
+## What it costs
 
-I won’t put API keys in the repository. For local work, I can copy `.env.example` to `.env`; Git ignores that file. Before using a real person’s face, likeness, or voice, I’ll record their informed consent in `ETHICS.md`. I’ll also check and note the terms for the models I use.
+The pipeline runs on free tiers. At Cloudflare's published tile prices a square 1280 pixel keyframe, with its reference images, comes to about $0.004. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
 
-## Putting the project on GitHub
+## Status
 
-After creating an empty public repository, I can push this project from its folder:
+Working, and tried end to end as a dry run: validation, narration, keyframes, the radio cut, and the film in both aspect ratios with subtitles and the end card.
 
-```bash
-git init
-git add .
-git commit -m "initial commit with boiler-plate scaffolding"
-git branch -M main
-git remote add origin https://github.com/SolomonZinabu/heritage-short-pipeline.git
-git push -u origin main
-```
+Not built yet: moving shots from Wan 2.2 and the score from ACE-Step 1.5, which both run on Kaggle. Until they are, a shot is shown as its keyframe with a slow move, and the film uses a placeholder score. The two model clients have not yet been run against the live services.
