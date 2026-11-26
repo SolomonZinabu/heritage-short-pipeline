@@ -296,14 +296,25 @@ def run_job(job: dict, out_dir: Path, note: Progress) -> int:
     pipeline = WanTI2V(config=config, checkpoint_dir=str(weights), device_id=0, rank=0, t5_cpu=True, convert_model_dtype=True)
     note(f"the model is loaded in {time.perf_counter() - started:.0f}s. {machine_memory()}")
 
-    # While the picture model works, the part that decodes pictures waits in the machine's memory.
+    # While the picture model works, the part that decodes pictures waits in
+    # the machine's memory; while it decodes, the model waits instead. The
+    # upstream generate() moves the model to CUDA before denoising and back
+    # to the CPU before vae.decode(), so piggyback on those .to() calls:
+    # model -> CUDA means denoise (VAE off the GPU), model -> CPU means
+    # decode (VAE onto the GPU). This T4 cannot hold both at once.
     model, vae, device = pipeline.model, pipeline.vae, pipeline.device
     model_to = model.to
 
     def to(*args, **kwargs):
         moved = model_to(*args, **kwargs)
         target = args[0] if args else kwargs.get("device")
-        vae.model.to("cpu") if isinstance(target, torch.device) and target.type == "cuda" else vae.model.to(device)
+        target_type = getattr(target, "type", None)
+        on_cuda = target_type == "cuda" if callable(target_type) else str(target).startswith("cuda")
+        if on_cuda:
+            vae.model.to("cpu")
+        else:
+            # The model parked (CPU or a dtype cast) - decode is next.
+            vae.model.to(device)
         return moved
 
     model.to = to
