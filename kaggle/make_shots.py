@@ -250,57 +250,40 @@ def run_job(job: dict, out_dir: Path, note: Progress) -> int:
     if not getattr(_wan_attention, "FLASH_ATTN_2_AVAILABLE", False) and not getattr(_wan_attention, "FLASH_ATTN_3_AVAILABLE", False):
         import torch as _torch
 
+        # Call-site contract (wan/modules/model.py): q [B, Lq, Nq, C1],
+        # k [B, Lk, Nk, C1], v [B, Lk, Nk, C2] - heads at dim 2, NOT dim 1.
+        # q_lens/k_lens [B] give each batch row's true length (RoPE-padded
+        # rows are junk that must not be attended to).
         def _sdpa_attention(q, k, v, q_lens=None, k_lens=None, dropout_p=0.0,
-                             softmax_scale=None, q_scale=None, causal=False,
-                             window_size=(-1, -1), deterministic=False,
-                             dtype=_torch.bfloat16, fa_version=None, **_ignored):
-            # flash_attention packs varlen sequences into one flattened row
-            # batch; SDPA wants a padded [B, heads, L, dim] layout.
-            if q_lens is not None:
-                import math as _math
-                b = len(q_lens)
-                lq = int(max(q_lens))
-                q = _torch.stack([
-                    _torch.nn.functional.pad(u[:n], (0, 0, 0, lq - n))
-                    for u, n in zip(q, q_lens)
-                ])
-            else:
-                b, lq = q.shape[0], q.shape[1]
-                q = q.transpose(1, 2)
-            if k_lens is not None:
-                lk = int(max(k_lens))
-                k = _torch.stack([
-                    _torch.nn.functional.pad(u[:n], (0, 0, 0, lk - n))
-                    for u, n in zip(k, k_lens)
-                ])
-                v = _torch.stack([
-                    _torch.nn.functional.pad(u[:n], (0, 0, 0, lk - n))
-                    for u, n in zip(v, k_lens)
-                ])
-            else:
-                lk = k.shape[1]
-                k = k.transpose(1, 2)
-                v = v.transpose(1, 2)
-            q = q.to(dtype); k = k.to(dtype); v = v.to(dtype)
+                            softmax_scale=None, q_scale=None, causal=False,
+                            window_size=(-1, -1), deterministic=False,
+                            dtype=_torch.bfloat16, fa_version=None, **_ignored):
+            b, lq, lk = q.size(0), q.size(1), k.size(1)
+            device = q.device
+            ql = q_lens if q_lens is not None else _torch.full((b,), lq, dtype=_torch.long, device=device)
+            kl = k_lens if k_lens is not None else _torch.full((b,), lk, dtype=_torch.long, device=device)
+            ql = ql.to(device=device, dtype=_torch.long)
+            kl = kl.to(device=device, dtype=_torch.long)
+
+            # [B, L, N, C] -> [B, N, L, C] for SDPA.
+            q4 = q.permute(0, 2, 1, 3).to(dtype)
+            k4 = k.permute(0, 2, 1, 3).to(dtype)
+            v4 = v.permute(0, 2, 1, 3).to(dtype)
             if q_scale is not None:
-                q = q * q_scale
-            # Padded rows attend only within their own sequence.
-            attn_mask = None
-            if q_lens is not None:
-                device = q.device
-                ar = _torch.arange(lq, device=device)[None, :] < _torch.tensor(list(map(int, q_lens)), device=device)[:, None]
-                attn_mask = ar[:, None, None, :].to(q.dtype) * 0.0
-                arange_k = _torch.arange(lk, device=device)
-                valid_k = arange_k[None, :] < _torch.tensor(list(map(int, k_lens)), device=device)[:, None]
-                joint = ar[:, :, None] & valid_k[:, None, :]
-                attn_mask = _torch.where(joint, 0.0, float("-inf")).to(q.dtype)[:, None, :, :]
+                q4 = q4 * q_scale
+
+            # A row may attend only to the OTHER row's real tokens: valid
+            # queries of batch i against valid keys of batch i. Everything
+            # else (padding of either side) gets -inf.
+            qi = _torch.arange(lq, device=device)[None, :] < ql[:, None]      # [B, Lq]
+            ki = _torch.arange(lk, device=device)[None, :] < kl[:, None]      # [B, Lk]
+            joint = qi[:, :, None] & ki[:, None, :]                            # [B, Lq, Lk]
+            attn_mask = _torch.where(joint, 0.0, float("-inf")).to(dtype)[:, None, :, :]  # [B, 1, Lq, Lk]
+
             out = _torch.nn.functional.scaled_dot_product_attention(
-                q, k, v, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
-            out = out.transpose(1, 2).contiguous()
-            # Unpack back to the flattened varlen layout the caller expects.
-            if q_lens is not None:
-                out = _torch.cat([u[:n] for u, n in zip(out, q_lens)])
-            return out
+                q4, k4, v4, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
+            # [B, N, L, C] -> [B, L, N, C], the caller's layout.
+            return out.permute(0, 2, 1, 3).contiguous().to(q.dtype)
 
         _wan_model.flash_attention = _sdpa_attention
         note("attention: flash_attn unavailable (T4) - model.py flash_attention routed to an SDPA fallback")
