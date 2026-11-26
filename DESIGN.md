@@ -42,15 +42,15 @@ Known and not corrected: the milking picture (shot 02) shows three cows.
 Ten pictures are upright and three (the chase) are wide. The films are 9:16 and 16:9. A picture much taller or wider than the frame is looked at through a window of the frame's shape that moves slowly across it. The three wide pictures are therefore a little soft in the upright film, because a small part of each is enlarged. Upright versions of them would fix that.
 
 ## Test 1: radio cut (at least three intended-audience viewers)
-- Date / format: **not done yet.** The narration has not been spoken.
-- Viewers: none yet.
-- What they said: nothing yet.
-- What changed in storyboard.json because of this: nothing yet.
+- Date / format: **26 Nov 2026, before 15:30 EAT.** Solomon played the film to three people and reported: "my mom, my gf and my friend liked them all". **Which file they watched**, the sound-only cut or the finished film, is for him to say.
+- Viewers (use non-sensitive labels): his mother, his partner and a friend.
+- What they said: that they liked it. Nothing was said against it. **What each one laughed at, and what each one would change, is not written down yet.**
+- What changed in storyboard.json because of this: nothing so far.
 
 ## Test 2: near-final film (at least three intended-audience viewers)
-- Date / format: not done yet.
-- Viewers: none yet.
-- What they said: nothing yet.
+- Date / format: not recorded separately yet. If the three above watched the finished film, this was the second test and the first has not been done with the sound-only cut.
+- Viewers (use non-sensitive labels): none recorded yet.
+- What they said: nothing recorded yet.
 - What changed because of this: nothing yet.
 
 ## What the first version got wrong, in the film-maker's words

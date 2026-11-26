@@ -30,6 +30,7 @@ A dry run that calls no model and spends nothing: `python -m pipeline film --moc
 | `python -m pipeline narration` | Speaks the line of every shot. `--only shot_06` speaks one. `--voice Name` tries another narrator for that run only. |
 | `python -m pipeline keyframes` | Takes the pictures the storyboard gives for each shot. For a shot with a prompt and no picture, it makes the picture with FLUX on Cloudflare Workers AI. |
 | `python -m pipeline music` | Reuses the score, or writes the job that makes it on Kaggle. `music import score.zip` brings the result back. |
+| `python -m pipeline shots` | Lists the clips asked for by stills with a `clip_prompt`, and writes the job that makes them on Kaggle with Wan 2.2. `shots import clips.zip` brings them back. |
 | `python -m pipeline radio` | The radio cut: the narration over a placeholder score, on a black screen. It goes on without a line the speech service is refusing for now, and says which. |
 | `python -m pipeline film` | Narration, the pictures, the score and the edit, in 9:16 and 16:9, with subtitles, the end card and a note inside the file. It refuses to run without every line. |
 | `python -m pipeline check` | Measures generated sound: level, clipped samples, silence at each end, and how high or low the voice is. |
@@ -71,4 +72,12 @@ The first version of this film had its pictures made by FLUX.2 klein 4B on Cloud
 
 ## Status
 
-Working end to end as a dry run in both aspect ratios, at full size, with the film-maker's pictures and the chosen score. The narration is the film-maker's own text and has not been spoken yet: it waits for the speech service's daily allowance. The audience tests, the report, the walkthrough and the public post are not done. `DESIGN.md` says what has and has not been done.
+The film is finished: 89.5 s with the end card, in 9:16 and 16:9, with the film-maker's pictures, his own narration spoken by Gemini TTS, the score made on Kaggle, English subtitles and the AI end card. It runs from the storyboard with one command.
+
+Against the brief, three things are missing or different, and the report says so:
+
+- **Moving shots: tried three times on Kaggle, and failed. The film is the brief's stated fallback.** The brief asks for Wan 2.2 image-to-video on Kaggle for as many shots as the quota allows. The stage is built and two stills ask for a clip. On the free T4 the model loaded, but ran out of the GPU's memory on even the smallest clip, in both number formats it supports. The three attempts, with their logs, are in `FAILURES.md`. Until a clip exists, the film is stills with slow moves. `kaggle/README.md` says how the attempt is run.
+- **The pictures were made by the film-maker, outside the pipeline.** The pipeline can make a keyframe from a prompt with FLUX, and did for a first version, but the film-maker rejected those pictures and supplied his own, made with a tool of his choice. The pipeline copies and crops them.
+- **The edit is cut to the narration, not to the music cues.** Each shot's `music_cue` is written down; the edit does not act on it.
+
+The audience tests, the report, the walkthrough and the public post are not done. `DESIGN.md` says what has and has not been done, and `FAILURES.md` what went wrong on the way, including a first finished film that had no narrator.

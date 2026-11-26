@@ -18,6 +18,7 @@ Nothing was paid. Every call ran on a free tier. The figures below are read from
 | Hand-sent probes | Gemini TTS | 3: 1 made, 2 refused | 0.9 s | none | 0 | 0 | Sent by hand to read the service's limit message. One of the three was not timed. See `FAILURES.md`. |
 | Score, test | ACE-Step 1.5, on Kaggle | 1, made | 10.7 s | 0.2 | 0 | not known | 15 s of music. Installation took 72 s and is not counted. |
 | Score, real | ACE-Step 1.5, on Kaggle | 3, made | 14.0 s, 17.2 s | 0.7 | 0 | not known | Three candidates of 90 s each, made by Solomon on 26 Nov 2026. They took 17.2 s, 14.0 s and 14.0 s on a Tesla T4. Installation took 4 min 10 s and is not counted. Their music lasts 80.6 s, 86.0 s and 82.4 s. |
+| Moving shots, three attempts | Wan 2.2 TI2V-5B, on Kaggle | 3, all failed | 264 s, and longer | 0.8 | 0 | not known | No clip was made. The first attempt stopped at an import, the second on an assertion in the model, the third for want of GPU memory in both number formats. `FAILURES.md`. |
 | Experiments 8 and 9 | FFmpeg only | no model called | | | 0 | 0 | Ducking measured, and two ways of fitting a still. Local files only. |
 
 ## Allowances
@@ -26,7 +27,7 @@ Nothing was paid. Every call ran on a free tier. The figures below are read from
 |---|---|---|---|
 | Cloudflare Workers AI | 10,000 Neurons a day | 5,489.13 counted for 25 Nov, which is 54.9 per cent of a day, and about 30 more for the smoke image, which was logged before Neurons were recorded. More was spent on 26 Nov on test pictures that were all rejected. | Nothing. The film-maker supplies the pictures; the first version's 3,638.55 Neurons were spent on pictures that are not in the film. |
 | Gemini TTS | 10 requests a day, as the service states | 11 lines, one smoke line and one probe were served | 8, one per line, which leaves 2 spare |
-| Kaggle | GPU hours a week | Under one minute of GPU time so far | About five minutes for three 90-second candidates, by the test's rate |
+| Kaggle | GPU hours a week | About 47 minutes so far: under one for the score, and 46 for three failed attempts at moving shots | About five minutes for three 90-second candidates, by the test's rate |
 
 ## What a full run amounts to
 
@@ -55,4 +56,6 @@ Measured on 26 Nov 2026, on a dry run of the whole film at full size (1080 by 19
 | Length of that film | 89.08 s, 2,138 frames at 24 frames a second | Counted by decoding. |
 | Loudness of that film | Minus 14.0 LUFS, integrated; true peak minus 1.9 dBTP | FFmpeg's `loudnorm`, second pass. |
 
-Still to be measured on the finished film, once its narration is spoken: its length and its loudness.
+The finished film, measured on 26 Nov 2026 after the narration was spoken: 89.50 s, 2,148 frames at 24 frames a second; loudness minus 13.9 LUFS, integrated; true peak minus 1.0 dBTP. The upright film is 27.2 MB and the wide film 87.9 MB. The narrator is heard during every line: the likeness between the film's sound and the voice alone is 0.95 to 1.00.
+
+The narration took 9 requests on 26 Nov 2026: the line with the shout was spoken twice, the second time with a `<shout>` mark before the exclamation, and the service refused one call for 38 s before it was made. The eight lines as spoken last 84.5 s. They are brought 5 per cent closer together in time for the film, which costs nothing.

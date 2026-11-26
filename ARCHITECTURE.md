@@ -28,7 +28,7 @@ storyboard.json  (checked against schema/storyboard.schema.json before every run
 |---|---|---|---|---|
 | Narration | `python -m pipeline narration` | `narration` of each shot, the voice | `outputs/narration/<shot>-<key>.wav` | Gemini 3.8 Flash TTS |
 | Keyframes | `python -m pipeline keyframes` | the `stills` each shot names; for a shot with none, its `image_prompt` with the references | `outputs/keyframes/` | none for a given picture; FLUX.2 [klein] 4B on Cloudflare Workers AI for a generated one |
-| Shots | not built | keyframe and `motion_prompt` | `outputs/shots/` | Wan 2.2 TI2V-5B on Kaggle |
+| Shots | `python -m pipeline shots`, then `python -m pipeline shots import clips.zip` | the stills that have a `clip_prompt` | `outputs/shots/` | Wan 2.2 TI2V-5B on Kaggle, in float16 |
 | Music | `python -m pipeline music`, then `python -m pipeline music import score.zip` | `music` | `outputs/music/` | ACE-Step 1.5 on Kaggle |
 | Assembly | `python -m pipeline film`, `python -m pipeline radio` | everything above | `outputs/film/`, `outputs/radio/` | none: FFmpeg only |
 | Sound check | `python -m pipeline check` | sound files | nothing | none: plain arithmetic |
@@ -84,6 +84,7 @@ Mock runs (`--mock`) write to `outputs/_mock/`, call no model and log nothing, s
 | A call is interrupted, or FFmpeg fails | Every media file is written under a temporary name and moved into place only when it is complete, so a half-made file is never mistaken for a finished one. |
 | The joined picture or a film has the wrong number of frames | FFmpeg can stop at a damaged shot and still report success, so the frames are counted. A wrong count is an error, not a film. |
 | A piece comes out at another size | Pieces of different sizes can be joined without an error and spoil the film, so every piece is measured before it is joined. |
+| The mixed sound holds no narrator | A mix that holds only the score sounds finished and is not. The first line is looked for in the mix where it is spoken; if it is not found, the mix is refused. The voice is split before it goes to the two filters that need it. |
 | The sound mix | The score is repeated only as often as the film needs. A stream that never ends would keep the ducking filter waiting for ever. The mix also has a hard stop at the film's length. |
 | A shot's clip is shorter than the shot | Its last frame is held. |
 | A shot has no clip | Its keyframe is moved slowly instead. A shot with no keyframe is black. |
@@ -116,6 +117,8 @@ The job has run on Kaggle once, as a 15-second test. Its first run stopped on a 
 
 `python -m pipeline check` reads a sound file and reports how long it is, how much silence lies before and after the sound, the loudest sample, the number of clipped samples, and the pitch of the voice. It finds the pitch by comparing each short piece of the sound with a shifted copy of itself, in plain arithmetic, so it needs nothing beyond FFmpeg. It was written because a score test ended in silence that nobody could hear at the time. It does not judge acting, and its pitch is an estimate: on this film it read the excited lines higher than the calm ones and could not say why.
 
-## Still to build
+## The moving shots are an attempt on a GPU that is too small
 
-- The shots stage on Kaggle (Wan 2.2). The official code wants 24 GB of GPU memory and a number format that the free T4 does not have, so a shot is shown as its keyframe with a slow move until that is settled.
+The shots stage works like the score stage: a job is written here, run on Kaggle, and brought back. A still with a `clip_prompt` asks for a clip, and a clip that exists takes the place of its still for the still's time; after the clip its last frame is held.
+
+Wan 2.2's code is written for a GPU with 24 GB and for bfloat16 numbers. Kaggle's free T4 has 16 GB and no bfloat16. The job makes a private copy on Kaggle and changes three lines of it: the picture model runs in float16, and is loaded straight into float16 from weight files converted first, so that the machine's memory is enough. The part that decodes pictures waits in the machine's memory while the picture model works. The job tries a clip of nine frames first and stops at the first failure, so that a failure costs minutes and not an hour. No clip has come out. On 26 Nov 2026 three attempts on the free T4 failed; the last two for want of GPU memory, in both number formats. They are in `FAILURES.md`, and the film uses the brief's fallback.
