@@ -62,6 +62,10 @@ def semantic_errors(storyboard: dict[str, Any]) -> list[str]:
         has_brief = "prompt" in reference and "seed" in reference
         if not has_photo and not has_brief:
             errors.append(f"reference {reference['id']} needs either a file (a photo) or a prompt and a seed")
+    for shot in storyboard["shots"]:
+        for number, still in enumerate(shot.get("stills", []), start=1):
+            if "clip_frames" in still and still["clip_frames"] % 4 != 1:
+                errors.append(f"{shot['id']} still {number}: clip_frames must be one more than a multiple of four, as Wan 2.2 needs")
     return errors
 
 

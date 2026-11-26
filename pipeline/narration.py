@@ -5,10 +5,11 @@ nothing else. The length of each line is then what sets the pace of the edit.
 """
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any
 
-from . import cache, media, timeline
+from . import cache, ffmpeg, media, timeline
 from .config import OUTPUTS, private
 from .providers import gemini_tts
 from .retry import TransientError, with_retries
@@ -16,6 +17,8 @@ from .runlog import logged_call
 from .util import say, select_shots
 
 STAGE = "narration"
+# The wait between two spoken lines, in seconds.
+PAUSE_SECONDS = 6
 
 
 def inputs_for(
@@ -25,11 +28,16 @@ def inputs_for(
 
     ``voice`` is a try-out of another narrator. The storyboard's own voice stays
     what the film uses until the storyboard says otherwise.
+
+    A shot's ``speech`` is what the service is asked to read. It is the line
+    itself, unless the shot gives a ``speech`` of its own: the same words with a
+    performance mark in them, such as ``<shout>`` before words that are called
+    out. The narration, the words, is then left as the film-maker wrote it.
     """
     chosen = storyboard.get("narration", {})
     return {
         "model": settings["narration"]["model"],
-        "text": shot["narration"],
+        "text": shot.get("speech") or shot["narration"],
         "voice": voice or chosen.get("voice") or settings["narration"]["voice"],
         "style": chosen.get("style", settings["narration"]["style"]),
     }
@@ -85,6 +93,23 @@ def report(storyboard: dict[str, Any], paths: dict[str, Path], settings: dict[st
     say(f"The film will run {timeline.film_seconds(cuts, end_card):.2f}s including the end card.")
 
 
+def paced(raw: Path, speed: float, directory: Path, shot_id: str) -> Path:
+    """A spoken line brought slightly closer together in time, its pitch unchanged.
+
+    The service's pace is its own. When the film would run past its length, the
+    lines can be made a few per cent shorter without speaking them again. The
+    original is kept, and the shortened copy is named after it and the speed.
+    """
+    key = cache.cache_key(STAGE, {"line": cache.file_hash(raw), "speed": speed})
+    path = cache.output_path(directory, shot_id, key, ".wav")
+    if path.exists():
+        return path
+    part = path.with_name(f"{path.stem}.part.wav")
+    ffmpeg.run_ffmpeg(["-y", "-i", str(raw), "-af", f"atempo={speed}", "-c:a", "pcm_s16le", str(part)])
+    part.replace(path)
+    return path
+
+
 def run(
     storyboard: dict[str, Any],
     settings: dict[str, Any],
@@ -102,6 +127,7 @@ def run(
     a finished film refuses to be made without every line.
     """
     directory = OUTPUTS / "_mock" / STAGE if mock else OUTPUTS / STAGE
+    speed = float(settings["narration"].get("speed", 1.0))
     manifest = None if mock else cache.Manifest()
     paths: dict[str, Path] = {}
     for shot in select_shots(storyboard["shots"], only):
@@ -123,6 +149,12 @@ def run(
                 say(f"    {exc}")
                 continue
             say(f"{shot['id']}  narration  generated   {path.name}  {media.wav_seconds(path):.2f}s")
+            # Calls made one right after another were refused for a while on 25 Nov 2026.
+            # A short pause between two lines keeps the day's few requests from
+            # being spent on refusals.
+            time.sleep(PAUSE_SECONDS)
+        if speed != 1.0 and not mock:
+            path = paced(path, speed, directory, shot["id"])
         paths[shot["id"]] = path
         if manifest is not None:
             manifest.record(STAGE, shot["id"], {"file": str(path), "key": key, "produced_by": inputs["model"], "inputs": inputs})
