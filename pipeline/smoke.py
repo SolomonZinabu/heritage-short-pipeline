@@ -75,7 +75,10 @@ def _try_tts(folder: Path, settings: dict) -> tuple[str, dict | None]:
         audio = media.as_wav(gemini_tts.synthesize(TTS_SAMPLE, voice=voice, style="", model=model, api_key=config.private("GEMINI_API_KEY")))
         path = media.write_bytes(folder / f"tts-{time.strftime('%Y%m%d-%H%M%S')}.wav", audio)
         seconds = media.wav_seconds(path)
-        record.update(output=cache.relative(path), output_sha256=cache.file_hash(path), output_seconds=round(seconds, 3))
+        record.update(
+            output=cache.relative(path), output_sha256=cache.file_hash(path), output_seconds=round(seconds, 3),
+            list_price_usd=gemini_tts.list_price_usd(seconds),
+        )
     return f"ok, {seconds:.2f}s of speech in {folder.name}/{path.name}", record
 
 

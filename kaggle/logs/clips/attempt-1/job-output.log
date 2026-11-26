@@ -1,0 +1,39 @@
+[12:28:17] wan/configs/shared_config.py: patched for the T4
+[12:28:17] wan/modules/attention.py: patched for the T4
+[12:28:17] wan/textimage2video.py: patched for the T4
+[12:28:27] Python 3.11.17, torch 2.15.0+cu132, CUDA 13.2; 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+[12:28:28] GPU: Tesla T4; bfloat16 supported: True; compute capability (7, 5)
+[12:28:28] diffusion_pytorch_model-00001-of-00003.safetensors: converting to float16, 9.2 GB
+[12:29:27] diffusion_pytorch_model-00001-of-00003.safetensors: now 4.6 GB
+[12:29:27] diffusion_pytorch_model-00002-of-00003.safetensors: converting to float16, 9.3 GB
+[12:30:24] diffusion_pytorch_model-00002-of-00003.safetensors: now 4.7 GB
+[12:30:24] diffusion_pytorch_model-00003-of-00003.safetensors: converting to float16, 0.2 GB
+[12:30:25] diffusion_pytorch_model-00003-of-00003.safetensors: now 0.1 GB
+Traceback (most recent call last):
+  File "/kaggle/working/make_shots.py", line 443, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/kaggle/working/make_shots.py", line 436, in main
+    code = run_job(job, out_dir, note) if inner else setup(job, job_file, out_dir, note)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/working/make_shots.py", line 217, in run_job
+    from wan.textimage2video import WanTI2V
+  File "/kaggle/tmp/heritage-shots/Wan2.2/wan/textimage2video.py", line 15, in <module>
+    import torchvision.transforms.functional as TF
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torchvision/__init__.py", line 10, in <module>
+    from torchvision import _meta_registrations, datasets, io, models, ops, transforms, utils  # usort:skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torchvision/_meta_registrations.py", line 163, in <module>
+    @torch.library.register_fake("torchvision::nms")
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/library.py", line 1271, in register
+    use_lib._register_fake(
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/library.py", line 354, in _register_fake
+    handle = entry.fake_impl.register(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/_library/fake_impl.py", line 87, in register
+    lib.impl(self.qualname, meta_kernel, "Meta", allow_override=allow_override)
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/library.py", line 496, in impl
+    if torch._C._dispatch_has_kernel_for_dispatch_key(
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: operator torchvision::nms does not exist

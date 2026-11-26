@@ -12,3 +12,17 @@ Thumbs.db
 outputs/_mock/
 outputs/_build/
 outputs/_jobs/
+
+# Photographs of real people are not published, nor the small copies made from
+# them for the first version of this film. The rules are anchored, so that only
+# these files are left out. The film's pictures are the film-maker's own, in
+# keyframes/.
+/references/
+outputs/references/mother-*.jpg
+outputs/references/boy-*.jpg
+
+# The pictures of the first version, made by an image model from those
+# photographs, were rejected and are not published. The copies the pipeline
+# makes of the film-maker's pictures need no model: a clean clone makes them
+# again from keyframes/.
+outputs/keyframes/

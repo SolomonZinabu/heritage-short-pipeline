@@ -9,8 +9,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from . import cache, media
-from .config import OUTPUTS, private
+from . import cache, media, shots
+from .config import OUTPUTS, ROOT, private
 from .providers import cloudflare_flux
 from .retry import with_retries
 from .runlog import logged_call
@@ -25,8 +25,28 @@ def compose_prompt(*parts: str) -> str:
     return ". ".join(part.strip().rstrip(".") for part in parts if part and part.strip())
 
 
+def cast_of(storyboard: dict[str, Any], shot: dict[str, Any]) -> list[dict[str, Any]]:
+    """The references a shot is built on: the ones it names, or all of them when it names none.
+
+    A shot of milk spilling on the ground shows no one, and a shot of the boy
+    running shows no one but him. Sending the mother as well would only blur
+    both.
+    """
+    references = {reference["id"]: reference for reference in storyboard.get("references", [])}
+    if "cast" not in shot:
+        return list(references.values())
+    return [references[name] for name in shot["cast"]]
+
+
 def shot_prompt(storyboard: dict[str, Any], shot: dict[str, Any]) -> str:
-    return compose_prompt(shot["image_prompt"], storyboard["visual_style"], storyboard["character_reference_prompt"])
+    """The shot's own prompt, the style block, and a description of each reference in the shot."""
+    parts = [shot["image_prompt"], storyboard["visual_style"]]
+    cast = cast_of(storyboard, shot)
+    if cast or "cast" in shot:
+        parts += [member["prompt"] for member in cast]
+    else:
+        parts.append(storyboard["character_reference_prompt"])
+    return compose_prompt(*parts)
 
 
 def _image_size(path: Path) -> list[int]:
@@ -82,26 +102,97 @@ def generate(
             )
         return path
 
-    return with_retries(attempt, attempts=attempts, notify=say)
+    return with_retries(attempt, attempts=attempts, notify=say, service="images")
 
 
-def run(
-    storyboard: dict[str, Any],
-    settings: dict[str, Any],
-    *,
-    only: str | None = None,
-    force: bool = False,
-    mock: bool = False,
-) -> dict[str, Path]:
-    """Return the keyframe of every selected shot, making the reference sheet and the images that are missing."""
-    base = OUTPUTS / "_mock" if mock else OUTPUTS
+def from_photo(reference: dict[str, Any], width: int, height: int, base: Path) -> Path:
+    """A photo given in the storyboard, kept as a reference for a real person.
+
+    Nothing is generated. The photo is only brought down to the size of the
+    generated references. The copy is named after the photo's fingerprint, so
+    it is found again even where the photo itself is not: the photographs of
+    real people stay out of the public repository, and a clean clone that holds
+    the copy still runs.
+    """
+    from PIL import Image, ImageOps
+
+    source = ROOT / reference["file"]
+    fingerprint = reference.get("sha256")
+    if source.is_file():
+        found = cache.file_hash(source)
+        if fingerprint and fingerprint != found:
+            raise SystemExit(f"{reference['id']}: the photo {reference['file']} has changed. Its sha256 in the storyboard must become {found}.")
+        fingerprint = found
+    if not fingerprint:
+        raise SystemExit(f"{reference['id']}: there is no photo at {reference['file']}, and no sha256 to find its copy by.")
+    key = cache.cache_key(REFERENCE_STAGE, {"source": fingerprint, "size": [width, height]})
+    # A copy of a photograph is not a stand-in, so a dry run may use the real
+    # one. That is what lets a clean clone, which has the copies and not the
+    # photographs, run without calling anything.
+    for folder in (base / REFERENCE_STAGE, OUTPUTS / REFERENCE_STAGE):
+        path = cache.find_output(folder, reference["id"], key, (".jpg",))
+        if path is not None:
+            return path
+    if not source.is_file():
+        raise SystemExit(
+            f"{reference['id']}: there is no photo at {reference['file']}, and no copy of it in outputs/references. "
+            "The film-maker keeps the photographs. Ask him for them, or put the copy back."
+        )
+    path = cache.output_path(base / REFERENCE_STAGE, reference["id"], key, ".jpg")
+    with Image.open(source) as picture:
+        picture = ImageOps.exif_transpose(picture).convert("RGB")
+        picture.thumbnail((width, height))  # shrunk to fit, never enlarged
+        path.parent.mkdir(parents=True, exist_ok=True)
+        picture.save(path, "JPEG", quality=94)
+    return path
+
+
+def from_still(still: dict[str, Any], label: str) -> Path:
+    """A picture made elsewhere and given in the storyboard, for a whole shot or for part of one.
+
+    Nothing is generated. The picture is copied, and cut to its ``crop`` when it
+    has one, so that what the film shows is on record with everything else. A
+    crop is given as left, top, right and bottom, each from 0 to 1 of the way
+    across or down the picture.
+    """
+    from PIL import Image, ImageOps
+
+    source = ROOT / still["file"]
+    if not source.is_file():
+        raise SystemExit(f"{label}: there is no picture at {still['file']}.")
+    crop = still.get("crop")
+    key = cache.cache_key("still", {"source": cache.file_hash(source), "crop": crop})
+    path = cache.output_path(OUTPUTS / STAGE, label, key, ".jpg")
+    if path.exists():
+        return path
+    with Image.open(source) as picture:
+        picture = ImageOps.exif_transpose(picture).convert("RGB")
+        if crop:
+            left, top, right, bottom = (float(value) for value in crop)
+            picture = picture.crop(
+                (round(left * picture.width), round(top * picture.height), round(right * picture.width), round(bottom * picture.height))
+            )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        picture.save(path, "JPEG", quality=95)
+    return path
+
+
+def _reference_sheet(
+    storyboard: dict[str, Any], settings: dict[str, Any], *, base: Path, size: tuple[int, int], full: tuple[int, int], mock: bool, force: bool
+) -> list[Path]:
+    """The references of the storyboard: a photograph is copied, a brief is generated."""
     stage_settings = settings["keyframes"]
-    width, height = (512, 512) if mock else (int(stage_settings["width"]), int(stage_settings["height"]))
+    width, height = size
     steps = int(stage_settings["steps"])
     attempts = int(settings["retries"]["attempts"])
-
     references: list[Path] = []
     for index, reference in enumerate(storyboard.get("references", [])):
+        if reference.get("file"):
+            # A photograph is copied once, at full size, whether this is a dry run or not.
+            path = from_photo(reference, *full, base)
+            say(f"{reference['id']:<10} reference  photo       {path.name}")
+            references.append(path)
+            continue
         inputs = {
             "model": stage_settings["model"],
             "prompt": compose_prompt(reference["prompt"], storyboard["visual_style"]),
@@ -128,14 +219,59 @@ def run(
                 path = generate(base / REFERENCE_STAGE, reference["id"], key, REFERENCE_STAGE, inputs, [], attempts)
                 say(f"{reference['id']:<10} reference  generated   {path.name}")
         references.append(path)
+    return references
+
+
+def run(
+    storyboard: dict[str, Any],
+    settings: dict[str, Any],
+    *,
+    only: str | None = None,
+    force: bool = False,
+    mock: bool = False,
+) -> dict[str, list[Path]]:
+    """Return the pictures of every selected shot, in order: the ones given in the storyboard, or made here."""
+    base = OUTPUTS / "_mock" if mock else OUTPUTS
+    stage_settings = settings["keyframes"]
+    full = (int(stage_settings["width"]), int(stage_settings["height"]))
+    width, height = (512, 512) if mock else full
+    steps = int(stage_settings["steps"])
+    attempts = int(settings["retries"]["attempts"])
+    selected = select_shots(storyboard["shots"], only)
+    # The reference sheet is only for pictures made here.
+    if any(not shot.get("stills") for shot in selected):
+        references = _reference_sheet(storyboard, settings, base=base, size=(width, height), full=full, mock=mock, force=force)
+    else:
+        references = []
 
     if not stage_settings["use_references"]:
         references = []
     used = {path.stem.split("-")[0]: path for path in references}
 
-    keyframes: dict[str, Path] = {}
+    keyframes: dict[str, list[Path]] = {}
     manifest = None if mock else cache.Manifest()
-    for index, shot in enumerate(select_shots(storyboard["shots"], only)):
+    for index, shot in enumerate(selected):
+        if shot.get("stills"):
+            # A picture given by the film-maker is used as it is, dry run or not.
+            paths = []
+            for number, still in enumerate(shot["stills"], start=1):
+                label = shot["id"] if len(shot["stills"]) == 1 else f"{shot['id']}-{number}"
+                # A still that asked for a clip is shown as that clip, once the clip exists.
+                clip = shots.clip_for(still, label, shot["seed"], settings)
+                if clip is not None:
+                    say(f"{label:<12}clip        reused      {clip.name}")
+                    paths.append(clip)
+                    if manifest is not None:
+                        manifest.record(STAGE, label, {"file": str(clip), "produced_by": "Wan 2.2 on Kaggle, from the film-maker's picture", "inputs": still})
+                    continue
+                path = from_still(still, label)
+                say(f"{label:<12}still       given       {path.name}")
+                paths.append(path)
+                if manifest is not None:
+                    manifest.record(STAGE, label, {"file": str(path), "produced_by": "given by the film-maker", "inputs": still})
+            keyframes[shot["id"]] = paths
+            continue
+        cast = cast_of(storyboard, shot)
         inputs = {
             "model": stage_settings["model"],
             "prompt": shot_prompt(storyboard, shot),
@@ -144,7 +280,7 @@ def run(
             "steps": steps,
             "seed": shot["seed"] if stage_settings["send_seed"] else None,
             # A new reference image means every keyframe built on it is out of date.
-            "references": {name: cache.file_hash(path) for name, path in used.items()},
+            "references": {member["id"]: cache.file_hash(used[member["id"]]) for member in cast if member["id"] in used},
         }
         key = cache.cache_key(STAGE, inputs)
         path = None if force else cache.find_output(base / STAGE, shot["id"], key, cache.IMAGE_SUFFIXES)
@@ -157,9 +293,10 @@ def run(
             )
             say(f"{shot['id']:<10} keyframe   mock        {path.name}")
         else:
-            path = generate(base / STAGE, shot["id"], key, STAGE, inputs, list(used.values()), attempts)
+            shown = [used[member["id"]] for member in cast if member["id"] in used]
+            path = generate(base / STAGE, shot["id"], key, STAGE, inputs, shown, attempts)
             say(f"{shot['id']:<10} keyframe   generated   {path.name}")
-        keyframes[shot["id"]] = path
+        keyframes[shot["id"]] = [path]
         if manifest is not None:
             manifest.record(STAGE, shot["id"], {"file": str(path), "key": key, "produced_by": inputs["model"], "inputs": inputs})
     if manifest is not None:

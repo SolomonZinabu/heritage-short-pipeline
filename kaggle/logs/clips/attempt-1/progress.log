@@ -1,0 +1,30 @@
+12:22:41 the machine: 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+12:22:41 downloading the model's code
+12:22:41 running: git clone --quiet --depth 1 https://github.com/Wan-Video/Wan2.2.git /kaggle/tmp/heritage-shots/Wan2.2
+12:22:42 exit code 0
+12:22:42 the code is at commit 1ea34ff
+12:22:42 making a private Python 3.11
+12:22:42 running: uv venv --python 3.11 /kaggle/tmp/heritage-shots/venv
+12:22:44 exit code 0
+12:22:44 installing PyTorch for the GPU. Several GB; this takes a while
+12:22:44 running: uv pip install --python /kaggle/tmp/heritage-shots/venv/bin/python torch==2.5.1 torchvision==0.20.1 --index-url
+12:23:14 exit code 0
+12:23:14 installing what the model's code needs, without its flash-attention, which the T4 cannot use
+12:23:14 running: uv pip install --python /kaggle/tmp/heritage-shots/venv/bin/python diffusers==0.31.0 transformers==4.51.3 accelerate
+12:25:36 exit code 0
+12:25:36 downloading the model's weights, 34 GB. This takes a while
+12:25:36 running: /kaggle/tmp/heritage-shots/venv/bin/python /kaggle/tmp/heritage-shots/download_weights.py Wan-AI/Wan2.2-TI2V-5B /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B
+12:28:00 exit code 0
+12:28:00 running the job. Everything it prints is kept in job-output.log
+12:28:17 wan/configs/shared_config.py: patched for the T4
+12:28:17 wan/modules/attention.py: patched for the T4
+12:28:17 wan/textimage2video.py: patched for the T4
+12:28:27 Python 3.11.17, torch 2.15.0+cu132, CUDA 13.2; 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+12:28:28 GPU: Tesla T4; bfloat16 supported: True; compute capability (7, 5)
+12:28:28 diffusion_pytorch_model-00001-of-00003.safetensors: converting to float16, 9.2 GB
+12:29:27 diffusion_pytorch_model-00001-of-00003.safetensors: now 4.6 GB
+12:29:27 diffusion_pytorch_model-00002-of-00003.safetensors: converting to float16, 9.3 GB
+12:30:24 diffusion_pytorch_model-00002-of-00003.safetensors: now 4.7 GB
+12:30:24 diffusion_pytorch_model-00003-of-00003.safetensors: converting to float16, 0.2 GB
+12:30:25 diffusion_pytorch_model-00003-of-00003.safetensors: now 0.1 GB
+12:30:36 the job ended with code 1

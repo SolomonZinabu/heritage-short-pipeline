@@ -88,6 +88,12 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "steps": 8,
         "shift": 3.0,
     },
+    "shots": {
+        "model": "wan2.2-ti2v-5b",
+        "steps": 30,
+        # Wan 2.2 makes 24 frames a second, and needs one more frame than a multiple of four.
+        "frames": 81,
+    },
     "assembly": {
         "fps": 24,
         "lead_in_seconds": 0.25,

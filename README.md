@@ -1,6 +1,8 @@
-# The Heritage Short
+# The Milk Mishap
 
-A 60 to 90 second short film that one file describes. `storyboard.json` lists every shot: its picture, its movement, the line spoken over it and the English subtitle. The pipeline in `pipeline/` turns that file into narration, keyframes and a finished film in two aspect ratios.
+A 60 to 90 second short film that one file describes. `storyboard.json` lists every shot: its picture or pictures, the line spoken over it and the English subtitle. The pipeline in `pipeline/` turns that file into narration and a finished film in two aspect ratios.
+
+The film is a family story in Amharic, told by the film-maker, Solomon Zinabu, about himself at six and his mother. It runs 88 seconds.
 
 ## Run it
 
@@ -10,11 +12,10 @@ You need Python 3.10 or newer and nothing else. FFmpeg comes with the Python pac
 python -m pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and fill in the three values: a Gemini API key, and a Cloudflare account ID and API token. The pipeline never prints them and Git ignores the file.
+Copy `.env.example` to `.env` and fill in a Gemini API key. The two Cloudflare values are needed only for a shot that has a prompt and no picture. The pipeline never prints these values and Git ignores the file.
 
 ```
 python -m pipeline doctor    # what is ready and what is missing
-python -m pipeline smoke     # one small call to each service, logged
 python -m pipeline film      # everything, in outputs/film/
 ```
 
@@ -24,41 +25,59 @@ A dry run that calls no model and spends nothing: `python -m pipeline film --moc
 
 | Command | What it does |
 |---|---|
-| `python -m pipeline validate` | Checks the storyboard against its schema and the 60 to 90 second rule. `--allow-draft` allows TODOs. |
+| `python -m pipeline validate` | Checks the storyboard against its schema and the 60 to 90 second rule. |
 | `python -m pipeline doctor` | Checks the packages, FFmpeg, which private values are set, and the storyboard. |
-| `python -m pipeline smoke` | Speaks one line and makes one image, and logs both. |
-| `python -m pipeline narration` | Speaks the line of every shot. |
-| `python -m pipeline keyframes` | Makes the reference sheet and the still of every shot. |
+| `python -m pipeline narration` | Speaks the line of every shot. `--only shot_06` speaks one. `--voice Name` tries another narrator for that run only. |
+| `python -m pipeline keyframes` | Takes the pictures the storyboard gives for each shot. For a shot with a prompt and no picture, it makes the picture with FLUX on Cloudflare Workers AI. |
 | `python -m pipeline music` | Reuses the score, or writes the job that makes it on Kaggle. `music import score.zip` brings the result back. |
-| `python -m pipeline radio` | The radio cut: the narration over a placeholder score, on a black screen. |
-| `python -m pipeline film` | Narration, keyframes and the edit, in 9:16 and 16:9, with subtitles and the end card. |
+| `python -m pipeline shots` | Lists the clips asked for by stills with a `clip_prompt`, and writes the job that makes them on Kaggle with Wan 2.2. `shots import clips.zip` brings them back. |
+| `python -m pipeline radio` | The radio cut: the narration over a placeholder score, on a black screen. It goes on without a line the speech service is refusing for now, and says which. |
+| `python -m pipeline film` | Narration, the pictures, the score and the edit, in 9:16 and 16:9, with subtitles, the end card and a note inside the file. It refuses to run without every line. |
+| `python -m pipeline check` | Measures generated sound: level, clipped samples, silence at each end, and how high or low the voice is. |
+| `python -m pipeline costs` | Turns `runs.jsonl` into a table for `COSTS.md`. |
 
-Every stage takes `--force` to make things again and `--mock` for a dry run. Narration and keyframes also take `--only shot_03,shot_07` to work on some shots.
+Every stage takes `--force` to make things again and `--mock` for a dry run.
 
 ## Change one thing, and only that is made again
 
-Edit one narration line in `storyboard.json` and run the film again. That line is spoken again. The other lines, the keyframes and everything else are reused, because every generated file is named after a hash of its inputs. `runs.jsonl` gains exactly one line.
+Edit one narration line in `storyboard.json` and run the film again. That line is spoken again. The other lines, the pictures and everything else are reused, because every generated file is named after a hash of its inputs. `runs.jsonl` gains exactly one line.
+
+## Pictures
+
+A shot names its pictures in `stills`: one, or several that are shown one after another. Each may name a `crop`, as left, top, right and bottom from 0 to 1, and its planned `seconds`. The pictures of this film are in `keyframes/`. They were made by the film-maker with an image tool of his own choice; the pipeline only copies and crops them.
+
+A picture's shape rarely matches both films. With `fit: "auto"`, a picture that is much taller or much wider than the frame is looked at through a window of the frame's shape that moves slowly across it. A picture of a close shape fills the frame, around the shot's `focus` if it names one.
 
 ## Where things are
 
 | Path | What it holds |
 |---|---|
-| `storyboard.json` | The contract: shots, durations, prompts, references, narration, music cues. |
+| `storyboard.json` | The contract: shots, durations, pictures, narration, subtitles, music. |
 | `schema/storyboard.schema.json` | What a valid storyboard looks like. Checked before every run. |
-| `pipeline/` | One module per stage, the two model clients, and the shared cache, log and retry code. |
+| `keyframes/` | The film-maker's pictures, one or more per shot. |
+| `pipeline/` | One module per stage, the model clients, and the shared cache, log and retry code. |
 | `kaggle/` | The job that makes the score on Kaggle, and how to run it. |
 | `runs.jsonl` | One line per model call: model, parameters, seed, latency, cost, and what came back. |
 | `outputs/` | Everything generated, kept so a run can be inspected. `outputs/manifest.json` says which file belongs to which shot. |
-| `ARCHITECTURE.md` | How the stages fit together, and how caching and failures are handled. |
+| `DESIGN.md`, `ARCHITECTURE.md`, `ETHICS.md` | The audience and the shots; how the stages fit; consent, licences and labelling. |
+| `EXPERIMENTS.md`, `FAILURES.md`, `COSTS.md` | What was tried, what went wrong, and what it measured. |
 
 ## What it costs
 
-The pipeline runs on free tiers. Cloudflare allows 10,000 Neurons a day free. A square 1280 pixel keyframe with two reference images uses about 330 of them, so a whole film's keyframes use about 3,800. On Cloudflare's paid plan that keyframe would cost about $0.004. `COSTS.md` holds the measured latency and the list-price equivalent of each stage.
+Nothing was paid. The speech service, Gemini TTS, allows 10 requests a day on its free tier, as the service itself states, and the day ends at 08:00 UTC. The film has eight lines, so eight requests, and the pipeline spends one only on a line that is missing. When a service asks for a long wait, the run stops, remembers the wait and sends nothing until it is over.
+
+The score is made on Kaggle's free GPU: three candidates of 90 seconds took 14 to 17 seconds each on a Tesla T4.
+
+The first version of this film had its pictures made by FLUX.2 klein 4B on Cloudflare Workers AI. The film-maker rejected them, for reasons recorded in `FAILURES.md`, and made his own. `COSTS.md` holds everything that was spent on both.
 
 ## Status
 
-Working, and tried end to end as a dry run: validation, narration, keyframes, the radio cut, the music stage, and the film in both aspect ratios with subtitles and the end card. The two hosted models, Gemini TTS and FLUX, have each answered a real call.
+The film is finished: 89.5 s with the end card, in 9:16 and 16:9, with the film-maker's pictures, his own narration spoken by Gemini TTS, the score made on Kaggle, English subtitles and the AI end card. It runs from the storyboard with one command.
 
-Not yet run on Kaggle: the score job for ACE-Step 1.5. It is written, and the part that brings its results back is tested, but the job itself has not run there.
+Against the brief, three things are missing or different, and the report says so:
 
-Not built: moving shots from Wan 2.2. Until then a shot is shown as its keyframe with a slow move, and a film with no score yet uses a placeholder score.
+- **Moving shots: tried three times on Kaggle, and failed. The film is the brief's stated fallback.** The brief asks for Wan 2.2 image-to-video on Kaggle for as many shots as the quota allows. The stage is built and two stills ask for a clip. On the free T4 the model loaded, but ran out of the GPU's memory on even the smallest clip, in both number formats it supports. The three attempts, with their logs, are in `FAILURES.md`. Until a clip exists, the film is stills with slow moves. `kaggle/README.md` says how the attempt is run.
+- **The pictures were made by the film-maker, outside the pipeline.** The pipeline can make a keyframe from a prompt with FLUX, and did for a first version, but the film-maker rejected those pictures and supplied his own, made with a tool of his choice. The pipeline copies and crops them.
+- **The edit is cut to the narration, not to the music cues.** Each shot's `music_cue` is written down; the edit does not act on it.
+
+The audience tests, the report, the walkthrough and the public post are not done. `DESIGN.md` says what has and has not been done, and `FAILURES.md` what went wrong on the way, including a first finished film that had no narrator.

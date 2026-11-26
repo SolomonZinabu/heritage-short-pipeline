@@ -52,6 +52,20 @@ def semantic_errors(storyboard: dict[str, Any]) -> list[str]:
     candidates = int(music.get("candidates", 1))
     if "chosen_index" in music and music["chosen_index"] >= candidates:
         errors.append(f"music.chosen_index is {music['chosen_index']}, but only {candidates} candidate(s) are generated")
+    known = {reference["id"] for reference in storyboard.get("references", [])}
+    for shot in storyboard["shots"]:
+        unknown = [name for name in shot.get("cast", []) if name not in known]
+        if unknown:
+            errors.append(f"{shot['id']} names a reference that does not exist: {', '.join(unknown)}")
+    for reference in storyboard.get("references", []):
+        has_photo = "file" in reference
+        has_brief = "prompt" in reference and "seed" in reference
+        if not has_photo and not has_brief:
+            errors.append(f"reference {reference['id']} needs either a file (a photo) or a prompt and a seed")
+    for shot in storyboard["shots"]:
+        for number, still in enumerate(shot.get("stills", []), start=1):
+            if "clip_frames" in still and still["clip_frames"] % 4 != 1:
+                errors.append(f"{shot['id']} still {number}: clip_frames must be one more than a multiple of four, as Wan 2.2 needs")
     return errors
 
 
@@ -68,7 +82,7 @@ def check_storyboard(storyboard: dict[str, Any], schema: dict[str, Any], *, allo
         errors.append(f"The film runs {total:g}s including the end card; the required range is 60-90s.")
     todos = find_todos(storyboard)
     if todos and not allow_draft:
-        errors.append("The storyboard still has TODO fields: " + ", ".join(todos))
+        errors.append(f"The storyboard still has TODO fields in {len(todos)} places. python -m pipeline validate lists them.")
     return errors, todos, total
 
 
@@ -94,6 +108,10 @@ def main() -> int:
     errors, todos, total = check_storyboard(storyboard, schema, allow_draft=args.allow_draft)
     for error in errors:
         print(f"Error: {error}", file=sys.stderr)
+    if todos and not args.allow_draft:
+        print(f"{len(todos)} fields still to fill:", file=sys.stderr)
+        for path in todos:
+            print(f"  {path}", file=sys.stderr)
     if errors:
         return 1
     mode = "draft structure valid" if todos else "storyboard valid"

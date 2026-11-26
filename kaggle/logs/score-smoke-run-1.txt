@@ -1,0 +1,276 @@
+Output of the first run of the 15-second score test on Kaggle.
+25 November 2026, 22:07 East Africa Time. GPU T4 x2.
+Copied from the notebook as it ran. The two lines of the first cell that hold the job and
+the script in encoded form are left out; they hold nothing else.
+
+
+Make the score with ACE-Step 1.5
+This notebook makes the score candidates of the film. It was written by python -m pipeline music, and it carries everything it needs.
+
+Before running: on the right, in Settings, under Accelerator, choose GPU T4 x2. Then choose Run all.
+
+The first run downloads the model and its parts, several GB, which takes a while. Later runs are quicker.
+
+When it has finished: download score.zip from the output panel. Then, on your own machine, run python -m pipeline music import score.zip.
+
+If it stops, open score/progress.log in the output panel. The reason is at its end.
+
+This job: 1 candidate(s), 15 seconds each, seeds 1.
+
+add Codeadd Markdown
+import base64, json, pathlib
+[the job and the script, in encoded form, are left out here]
+pathlib.Path("job.json").write_text(json.dumps(job, indent=2, ensure_ascii=False), encoding="utf-8")
+[the job and the script, in encoded form, are left out here]
+print(f"Job for {len(job["tasks"])} candidate(s) is written. Run the next cell.")
+
+Job for 1 candidate(s) is written. Run the next cell.
+add Codeadd Markdown
+!python make_score.py job.json
+Python 3.13.16 on Linux
+[19:07:19] downloading the ACE-Step code
+[19:07:19] running: git clone --depth 1 https://github.com/ACE-STEP/ACE-Step-1.5.git /kaggle/tmp/heritage-score/ACE-Step-1.5
+Cloning into '/kaggle/tmp/heritage-score/ACE-Step-1.5'...
+remote: Enumerating objects: 1293, done.
+remote: Counting objects: 100% (1293/1293), done.
+remote: Compressing objects: 100% (1231/1231), done.
+remote: Total 1293 (delta 50), reused 1221 (delta 48), pack-reused 0 (from 0)
+Receiving objects: 100% (1293/1293), 8.28 MiB | 29.15 MiB/s, done.
+Resolving deltas: 100% (50/50), done.
+[19:07:20] exit code 0
+[19:07:20] installing ACE-Step and its own PyTorch build. Several GB; this takes a while
+[19:07:20] running: uv sync
+Using CPython 3.11.17
+Creating virtual environment at: .venv
+Resolved 176 packages in 6.83s
+Prepared 142 packages in 1m 02s                                          
+Installed 142 packages in 455ms                             
+ + absl-py==2.4.0
+ + accelerate==1.12.0
+ + ace-step==1.5.0 (from file:///kaggle/tmp/heritage-score/ACE-Step-1.5)
+ + aiofiles==24.1.0
+ + aiohappyeyeballs==2.6.1
+ + aiohttp==3.13.3
+ + aiosignal==1.4.0
+ + annotated-doc==0.0.4
+ + annotated-types==0.7.0
+ + anyio==4.12.1
+ + attrs==25.4.0
+ + brotli==1.2.0
+ + certifi==2026.1.4
+ + cffi==2.0.0
+ + charset-normalizer==3.4.4
+ + click==8.3.1
+ + contourpy==1.3.3
+ + cuda-bindings==12.9.4
+ + cuda-pathfinder==1.3.3
+ + cycler==0.12.1
+ + diffusers==0.37.1
+ + diskcache==5.6.3
+ + einops==0.8.2
+ + einx==0.3.0
+ + fastapi==0.128.0
+ + ffmpy==1.0.0
+ + filelock==3.20.3
+ + flash-attn==2.8.3+cu128torch2.10 (from https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.7.12/flash_attn-2.8.3+cu128torch2.10-cp311-cp311-linux_x86_64.whl)
+ + fonttools==4.61.1
+ + frozendict==2.4.7
+ + frozenlist==1.8.0
+ + fsspec==2026.1.0
+ + gradio==6.2.0
+ + gradio-client==2.0.2
+ + groovy==0.1.2
+ + grpcio==1.78.0
+ + h11==0.16.0
+ + hf-xet==1.2.0
+ + httpcore==1.0.9
+ + httptools==0.7.1
+ + httpx==0.28.1
+ + huggingface-hub==0.36.0
+ + idna==3.11
+ + importlib-metadata==8.7.1
+ + jinja2==3.1.6
+ + kiwisolver==1.4.9
+ + lightning==2.6.1
+ + lightning-utilities==0.15.2
+ + llvmlite==0.46.0
+ + loguru==0.7.3
+ + lycoris-lora==3.4.0
+ + markdown==3.10.1
+ + markdown-it-py==4.0.0
+ + markupsafe==3.0.3
+ + matplotlib==3.10.8
+ + mdurl==0.1.2
+ + modelscope==1.34.0
+ + mpmath==1.3.0
+ + multidict==6.7.1
+ + nano-vllm==0.2.0 (from file:///kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/third_parts/nano-vllm)
+ + networkx==3.6.1
+ + numba==0.63.1
+ + numpy==2.3.5
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.5
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvshmem-cu12==3.4.5
+ + nvidia-nvtx-cu12==12.8.90
+ + orjson==3.11.5
+ + packaging==26.0
+ + pandas==2.3.3
+ + peft==0.18.1
+ + pillow==12.1.0
+ + propcache==0.4.1
+ + protobuf==6.33.5
+ + psutil==7.2.1
+ + pycparser==3.0
+ + pydantic==2.12.5
+ + pydantic-core==2.41.5
+ + pydub==0.25.1
+ + pygments==2.19.2
+ + pyparsing==3.3.2
+ + python-dateutil==2.9.0.post0
+ + python-dotenv==1.2.1
+ + python-multipart==0.0.22
+ + pytorch-lightning==2.6.1
+ + pytorch-wavelets==1.3.0
+ + pytz==2025.2
+ + pywavelets==1.9.0
+ + pyyaml==6.0.3
+ + regex==2026.1.15
+ + requests==2.32.5
+ + rich==14.3.1
+ + safehttpx==0.1.7
+ + safetensors==0.7.0
+ + scipy==1.17.0
+ + semantic-version==2.10.0
+ + setuptools==71.1.0
+ + shellingham==1.5.4
+ + six==1.17.0
+ + soundfile==0.13.1
+ + starlette==0.50.0
+ + sympy==1.14.0
+ + tensorboard==2.20.0
+ + tensorboard-data-server==0.7.2
+ + tokenizers==0.22.2
+ + toml==0.10.2
+ + tomlkit==0.13.3
+ + torch==2.10.0+cu128
+ + torchao==0.16.0
+ + torchaudio==2.10.0+cu128
+ + torchcodec==0.10.0
+ + torchmetrics==1.8.2
+ + torchvision==0.25.0+cu128
+ + tqdm==4.67.1
+ + transformers==4.57.6
+ + triton==3.6.0
+ + typer==0.21.1
+ + typer-slim==0.21.2
+ + typing-extensions==4.15.0
+ + typing-inspection==0.4.2
+ + tzdata==2025.3
+ + urllib3==2.6.3
+ + uvicorn==0.40.0
+ + uvloop==0.22.1
+ + vector-quantize-pytorch==1.27.20
+ + watchfiles==1.1.1
+ + websockets==16.0
+ + werkzeug==3.1.5
+ + xxhash==3.6.0
+ + yarl==1.22.0
+ + zipp==3.23.0
+[19:08:32] exit code 0
+[19:08:32] running the job
+2026-11-25 19:08:36.118 | DEBUG    | acestep.core.generation.handler.init_service_memory_basic:_apply_malloc_mmap_threshold:50 - [memory] Set M_MMAP_THRESHOLD=131072 for immediate OS reclaim of large frees
+Traceback (most recent call last):
+  File "/kaggle/working/make_score.py", line 286, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/kaggle/working/make_score.py", line 279, in main
+    code = run_job(job, out_dir, note) if inner else setup(job, job_file, out_dir, note)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/working/make_score.py", line 118, in run_job
+    from acestep.handler import AceStepHandler
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/handler.py", line 18, in <module>
+    from acestep.core.generation.handler import (
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/core/generation/handler/__init__.py", line 20, in <module>
+    from .lora_manager import LoraManagerMixin
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/core/generation/handler/lora_manager.py", line 5, in <module>
+    from .lora.lifecycle import add_lora, add_voice_lora, load_lora, remove_lora, unload_lora
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/core/generation/handler/lora/lifecycle.py", line 11, in <module>
+    from acestep.training.configs import LoKRConfig
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/training/__init__.py", line 30, in <module>
+    from acestep.training.data_module import (
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/acestep/training/data_module.py", line 21, in <module>
+    from lightning.pytorch import LightningDataModule
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/__init__.py", line 18, in <module>
+    from lightning.fabric.fabric import Fabric  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/__init__.py", line 35, in <module>
+    from lightning.fabric.fabric import Fabric  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/fabric.py", line 39, in <module>
+    from lightning.fabric.accelerators.accelerator import Accelerator
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/accelerators/__init__.py", line 15, in <module>
+    from lightning.fabric.accelerators.accelerator import Accelerator
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/accelerators/accelerator.py", line 19, in <module>
+    from lightning.fabric.accelerators.registry import _AcceleratorRegistry
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/accelerators/registry.py", line 18, in <module>
+    from lightning.fabric.utilities.exceptions import MisconfigurationException
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/utilities/__init__.py", line 16, in <module>
+    from lightning.fabric.utilities.apply_func import move_data_to_device
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/utilities/apply_func.py", line 24, in <module>
+    from lightning.fabric.utilities.imports import _NUMPY_AVAILABLE
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning/fabric/utilities/imports.py", line 41, in <module>
+    _TORCHMETRICS_GREATER_EQUAL_1_0_0 = compare_version("torchmetrics", operator.ge, "1.0.0")
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/lightning_utilities/core/imports.py", line 78, in compare_version
+    pkg = importlib.import_module(package)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/__init__.py", line 37, in <module>
+    from torchmetrics import functional  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/functional/__init__.py", line 14, in <module>
+    from torchmetrics.functional.audio._deprecated import _permutation_invariant_training as permutation_invariant_training
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/functional/audio/__init__.py", line 14, in <module>
+    from torchmetrics.functional.audio.pit import permutation_invariant_training, pit_permutate
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/functional/audio/pit.py", line 22, in <module>
+    from torchmetrics.utilities import rank_zero_warn
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/utilities/__init__.py", line 14, in <module>
+    from torchmetrics.utilities.checks import check_forward_full_state_property
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/utilities/checks.py", line 26, in <module>
+    from torchmetrics.metric import Metric
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/metric.py", line 43, in <module>
+    from torchmetrics.utilities.plot import _AX_TYPE, _PLOT_OUT_TYPE, plot_single_or_multi_val
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/torchmetrics/utilities/plot.py", line 26, in <module>
+    import matplotlib
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/matplotlib/__init__.py", line 1299, in <module>
+    rcParams['backend'] = os.environ.get('MPLBACKEND')
+    ~~~~~~~~^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-score/ACE-Step-1.5/.venv/lib/python3.11/site-packages/matplotlib/__init__.py", line 774, in __setitem__
+    raise ValueError(f"Key {key}: {ve}") from None
+ValueError: Key backend: 'module://matplotlib_inline.backend_inline' is not a valid value for backend; supported values are ['gtk3agg', 'gtk3cairo', 'gtk4agg', 'gtk4cairo', 'macosx', 'nbagg', 'notebook', 'qtagg', 'qtcairo', 'qt5agg', 'qt5cairo', 'tkagg', 'tkcairo', 'webagg', 'wx', 'wxagg', 'wxcairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
+[19:08:50] the job ended with code 1
+Everything is packed in /kaggle/working/score.zip
+add Codeadd Markdown
+import json, pathlib
+from IPython.display import FileLink, display
+manifest = pathlib.Path("score/manifest.json")
+print(manifest.read_text(encoding="utf-8") if manifest.exists() else "No manifest, so the job did not finish. Read the output above, or score/progress.log.")
+if pathlib.Path("score.zip").exists():
+    display(FileLink("score.zip"))
+
+No manifest, so the job did not finish. Read the output above, or score/progress.log.
+score.zip
+add Codeadd Markdown

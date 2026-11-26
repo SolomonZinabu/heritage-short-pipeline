@@ -1,0 +1,11 @@
+19:07:19 downloading the ACE-Step code
+19:07:19 running: git clone --depth 1 https://github.com/ACE-STEP/ACE-Step-1.5.git /kaggle/tmp/heritage-score/ACE-Step-1.5
+19:07:20 exit code 0
+19:07:20 installing ACE-Step and its own PyTorch build. Several GB; this takes a while
+19:07:20 running: uv sync
+19:08:32 exit code 0
+19:08:32 running the job
+19:08:50 the job ended with code 1
+19:15:17 running the job
+19:16:33 finished: 1 of 1 candidate(s), 0 failed, about 9 minutes on the GPU
+19:16:36 the job ended with code 0

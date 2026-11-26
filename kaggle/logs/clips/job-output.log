@@ -1,0 +1,98 @@
+[15:46:11] wan/configs/shared_config.py: set for float16
+[15:46:11] wan/modules/attention.py: set for float16
+[15:46:11] wan/textimage2video.py: set for float16
+[15:46:28] Python 3.11.17, torch 2.15.0+cu132, torchvision 0.29.2+cu132, diffusers 0.39.0, transformers 4.51.3, CUDA 13.2; 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+[15:46:28] GPU: Tesla T4; bfloat16 supported: True; compute capability (7, 5)
+[15:46:28] diffusion_pytorch_model-00001-of-00003.safetensors: converting to float16, 9.2 GB
+[15:47:22] diffusion_pytorch_model-00001-of-00003.safetensors: now 4.6 GB
+[15:47:22] diffusion_pytorch_model-00002-of-00003.safetensors: converting to float16, 9.3 GB
+[15:48:25] diffusion_pytorch_model-00002-of-00003.safetensors: now 4.7 GB
+[15:48:25] diffusion_pytorch_model-00003-of-00003.safetensors: converting to float16, 0.2 GB
+[15:48:26] diffusion_pytorch_model-00003-of-00003.safetensors: now 0.1 GB
+[15:48:35] attention: flash_attn unavailable (T4) - model.py flash_attention routed to an SDPA fallback
+[15:48:35] loading the model: the picture model in torch.float16, the text encoder in torch.bfloat16 in the machine's memory
+2026-11-26 15:49:55,733 INFO loading /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B/models_t5_umt5-xxl-enc-bf16.pth
+2026-11-26 15:50:43,675 INFO loading /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B/Wan2.2_VAE.pth
+2026-11-26 15:50:55,655 INFO Creating WanModel from /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B
+
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards:  33%|███▎      | 1/3 [00:00<00:00,  2.11it/s]
+Loading checkpoint shards:  67%|██████▋   | 2/3 [00:00<00:00,  2.59it/s]
+Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00,  3.72it/s]
+There are modules in WanModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+[15:50:56] the model is loaded in 141s. 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+[15:50:56] smoke: 9 frames at 704*1280 in 4 steps, seed 202
+/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py:1028: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with amp.autocast(dtype=self.dtype):
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+ 25%|██▌       | 1/4 [00:05<00:16,  5.45s/it]
+ 50%|█████     | 2/4 [00:10<00:10,  5.30s/it]
+ 75%|███████▌  | 3/4 [00:18<00:06,  6.41s/it]
+100%|██████████| 4/4 [00:23<00:00,  5.94s/it]
+100%|██████████| 4/4 [00:23<00:00,  5.90s/it]
+/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py:1042: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with amp.autocast(dtype=self.dtype):
+[15:56:08] smoke FAILED: out of GPU memory: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.68 GiB. GPU 0 has a total capacity of 14.56 GiB of which 1.60 GiB is free. Including non-PyTorch memory, this process has 12.96 GiB memory in use. Of the allocated memory 11.04 GiB is allocated by PyTorch, and 1.78 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+[15:56:08] the last lines of the error:
+itage-shots/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1787, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1798, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py", line 402, in forward
+    x = x.permute(0, 1, 5, 2, 6, 3, 7, 4).contiguous()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.68 GiB. GPU 0 has a total capacity of 14.56 GiB of which 1.60 GiB is free. Including non-PyTorch memory, this process has 12.96 GiB memory in use. Of the allocated memory 11.04 GiB is allocated by PyTorch, and 1.78 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[15:56:08] stopped at the first failure, so that the reason can be read and the GPU time not spent for nothing
+[15:56:08] finished: 0 of 3 clip(s) made, 1 failed, about 16 minutes on the GPU
+[15:56:13] wan/configs/shared_config.py: set for bfloat16
+[15:56:13] wan/modules/attention.py: set for bfloat16
+[15:56:13] wan/textimage2video.py: already set for bfloat16
+[15:56:19] Python 3.11.17, torch 2.15.0+cu132, torchvision 0.29.2+cu132, diffusers 0.39.0, transformers 4.51.3, CUDA 13.2; 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+[15:56:19] GPU: Tesla T4; bfloat16 supported: True; compute capability (7, 5)
+[15:56:19] diffusion_pytorch_model-00001-of-00003.safetensors: already in float16
+[15:56:19] diffusion_pytorch_model-00002-of-00003.safetensors: already in float16
+[15:56:19] diffusion_pytorch_model-00003-of-00003.safetensors: already in float16
+[15:56:20] attention: flash_attn unavailable (T4) - model.py flash_attention routed to an SDPA fallback
+[15:56:20] loading the model: the picture model in torch.bfloat16, the text encoder in torch.bfloat16 in the machine's memory
+2026-11-26 15:57:38,411 INFO loading /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B/models_t5_umt5-xxl-enc-bf16.pth
+2026-11-26 15:58:26,288 INFO loading /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B/Wan2.2_VAE.pth
+2026-11-26 15:58:38,214 INFO Creating WanModel from /kaggle/tmp/heritage-shots/Wan2.2-TI2V-5B
+
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards:  33%|███▎      | 1/3 [00:18<00:37, 18.76s/it]
+Loading checkpoint shards:  67%|██████▋   | 2/3 [00:37<00:18, 18.81s/it]
+Loading checkpoint shards: 100%|██████████| 3/3 [00:37<00:00, 10.35s/it]
+Loading checkpoint shards: 100%|██████████| 3/3 [00:37<00:00, 12.63s/it]
+There are modules in WanModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+[15:59:16] the model is loaded in 175s. 31 GB of memory in all, GPU Tesla T4, 15360 MiB; Tesla T4, 15360 MiB
+[15:59:16] smoke: 9 frames at 704*1280 in 4 steps, seed 202
+/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py:1028: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with amp.autocast(dtype=self.dtype):
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+ 25%|██▌       | 1/4 [00:30<01:30, 30.23s/it]
+ 50%|█████     | 2/4 [00:56<00:56, 28.01s/it]
+ 75%|███████▌  | 3/4 [01:23<00:27, 27.65s/it]
+100%|██████████| 4/4 [01:52<00:00, 28.04s/it]
+100%|██████████| 4/4 [01:52<00:00, 28.14s/it]
+/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py:1042: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with amp.autocast(dtype=self.dtype):
+[16:05:18] smoke FAILED: out of GPU memory: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.68 GiB. GPU 0 has a total capacity of 14.56 GiB of which 1.61 GiB is free. Including non-PyTorch memory, this process has 12.95 GiB memory in use. Of the allocated memory 11.04 GiB is allocated by PyTorch, and 1.78 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+[16:05:18] the last lines of the error:
+itage-shots/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1787, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1798, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/kaggle/tmp/heritage-shots/Wan2.2/wan/modules/vae2_2.py", line 402, in forward
+    x = x.permute(0, 1, 5, 2, 6, 3, 7, 4).contiguous()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.68 GiB. GPU 0 has a total capacity of 14.56 GiB of which 1.61 GiB is free. Including non-PyTorch memory, this process has 12.95 GiB memory in use. Of the allocated memory 11.04 GiB is allocated by PyTorch, and 1.78 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[16:05:18] stopped at the first failure, so that the reason can be read and the GPU time not spent for nothing
+[16:05:18] finished: 0 of 3 clip(s) made, 1 failed, about 25 minutes on the GPU

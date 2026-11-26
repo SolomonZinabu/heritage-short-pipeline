@@ -91,7 +91,8 @@ def generate_image(
     if seed is not None:
         fields.append(("seed", (None, str(seed))))
     for path in reference_images or []:
-        fields.append(("image", (path.name, path.read_bytes(), "image/png")))
+        kind = "image/png" if path.suffix.lower() == ".png" else "image/webp" if path.suffix.lower() == ".webp" else "image/jpeg"
+        fields.append(("image", (path.name, path.read_bytes(), kind)))
 
     response = post(
         f"{ACCOUNT_URL}/{account_id}/ai/run/{model}",
