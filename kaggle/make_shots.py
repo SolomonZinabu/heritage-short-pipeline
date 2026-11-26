@@ -296,28 +296,31 @@ def run_job(job: dict, out_dir: Path, note: Progress) -> int:
     pipeline = WanTI2V(config=config, checkpoint_dir=str(weights), device_id=0, rank=0, t5_cpu=True, convert_model_dtype=True)
     note(f"the model is loaded in {time.perf_counter() - started:.0f}s. {machine_memory()}")
 
-    # While the picture model works, the part that decodes pictures waits in
-    # the machine's memory; while it decodes, the model waits instead. The
-    # upstream generate() moves the model to CUDA before denoising and back
-    # to the CPU before vae.decode(), so piggyback on those .to() calls:
-    # model -> CUDA means denoise (VAE off the GPU), model -> CPU means
-    # decode (VAE onto the GPU). This T4 cannot hold both at once.
+    # While the picture model works, the part that decodes pictures waits
+    # in the machine's memory; while it decodes, the model waits instead.
+    # The upstream generate() parks the model with .cpu() (NOT .to() -
+    # torch.nn.Module.cpu() calls _apply directly and would bypass a .to
+    # hook) and brings it back with .to(device) before denoising. So BOTH
+    # moves must be piggybacked: .to(cuda) parks the VAE on the CPU for
+    # denoising; .cpu() brings the VAE onto the GPU for the decode that
+    # follows. This T4 cannot hold both halves of the model at once.
     model, vae, device = pipeline.model, pipeline.vae, pipeline.device
-    model_to = model.to
+    model_to, model_cpu = model.to, model.cpu
 
     def to(*args, **kwargs):
         moved = model_to(*args, **kwargs)
         target = args[0] if args else kwargs.get("device")
-        target_type = getattr(target, "type", None)
-        on_cuda = target_type == "cuda" if callable(target_type) else str(target).startswith("cuda")
+        on_cuda = str(getattr(target, "type", None) or target).strip("'").startswith("cuda")
         if on_cuda:
             vae.model.to("cpu")
-        else:
-            # The model parked (CPU or a dtype cast) - decode is next.
-            vae.model.to(device)
         return moved
 
-    model.to = to
+    def cpu(*args, **kwargs):
+        moved = model_cpu(*args, **kwargs)
+        vae.model.to(device)
+        return moved
+
+    model.to, model.cpu = to, cpu
 
     session_file = out_dir / "session.json"
     session = json.loads(session_file.read_text(encoding="utf-8")) if session_file.exists() else {"started_at": time.time()}
