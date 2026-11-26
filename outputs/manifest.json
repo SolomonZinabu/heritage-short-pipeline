@@ -1,0 +1,383 @@
+{
+  "keyframes": {
+    "shot_01": {
+      "file": "outputs/keyframes/shot_01-0b0b968527.jpg",
+      "key": "0b0b968527461917d513408603399b105fe8e82b0610f9272131b04f8dc5f8cc",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Extreme wide establishing shot of a traditional Ethiopian rural homestead at golden morning. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, two Zebu cows with large horns standing by a wooden fence, a battered aluminium milk jug on the ground, eucalyptus trees and green hills behind, low warm sun rays through light dust. No people. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 201,
+        "references": {
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_01-1": {
+      "file": "outputs/keyframes/shot_01-1-e62b57a745.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_01.jpg",
+        "crop": [
+          0,
+          0,
+          0.92,
+          1
+        ],
+        "seconds": 8
+      }
+    },
+    "shot_01-2": {
+      "file": "outputs/keyframes/shot_01-2-96ee564a08.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_02.jpg",
+        "crop": [
+          0,
+          0,
+          1,
+          0.62
+        ],
+        "seconds": 8
+      }
+    },
+    "shot_02": {
+      "file": "outputs/shots/shot_02-clip-bfe253a473.mp4",
+      "produced_by": "Wan 2.2 on Kaggle, from the film-maker's picture",
+      "inputs": {
+        "file": "keyframes/shot_03.jpg",
+        "clip_prompt": "The mother's hands squeeze the cow's udder and a thin stream of milk falls into the steel basin. The little boy crouches beside her and watches with a smile, his head moving slightly. The cow's ear twitches. Natural, gentle motion. The camera is still. Faces and clothes stay the same as in the picture.",
+        "clip_frames": 49
+      }
+    },
+    "shot_03": {
+      "file": "outputs/keyframes/shot_03-be849b83b6.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_04.jpg"
+      }
+    },
+    "shot_04": {
+      "file": "outputs/keyframes/shot_04-cd1d1c88e6.jpg",
+      "key": "cd1d1c88e6bbc630e8100c09b35e1b056d73643ab74b54275790ef546714fdca",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Close-up of fresh white milk being poured from a steel basin into a battered aluminium milk jug standing on the packed earth of the rural courtyard, a woman's hands in white sleeves at the edge of the frame, golden sunlight, droplets sparkling. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 204,
+        "references": {
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_04-1": {
+      "file": "outputs/keyframes/shot_04-1-7ec36381fe.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_05.jpg",
+        "crop": [
+          0,
+          0,
+          1,
+          0.6
+        ],
+        "seconds": 6
+      }
+    },
+    "shot_04-2": {
+      "file": "outputs/keyframes/shot_04-2-72a14853ae.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_06.jpg",
+        "seconds": 7
+      }
+    },
+    "shot_05": {
+      "file": "outputs/keyframes/shot_05-4f66911b18.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_07.jpg"
+      }
+    },
+    "shot_06": {
+      "file": "outputs/keyframes/shot_06-ebe102f9e8.jpg",
+      "key": "ebe102f9e8495146fb2a3ad3eacdc0b4b9241d538551f3cdee2c7be23e73c0e7",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "The six-year-old boy with the face of the child in the reference photo, in the red and black striped polo shirt and blue shorts, runs carelessly and bumps the aluminium milk jug with his knee. His hands are empty and thrown up in the air; he is not touching it. The jug tips over by itself at the height of his knee, in the middle of the frame, and milk starts to splash out. The instant of impact, in the rural courtyard, warm morning light. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. The boy is the child in the reference photo, shown here at six years old. Keep his face and his short black hair, and dress him in his red and black striped polo shirt with blue shorts. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 206,
+        "references": {
+          "boy": "9154b99b912d33650a29ac7ffcde4ddf51ec675f369b14a444b4112ab9de7372",
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_06-1": {
+      "file": "outputs/keyframes/shot_06-1-eb3683479f.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_08.jpg",
+        "seconds": 3
+      }
+    },
+    "shot_06-2": {
+      "file": "outputs/keyframes/shot_06-2-a505ac674f.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_09.jpg",
+        "seconds": 4
+      }
+    },
+    "shot_07": {
+      "file": "outputs/keyframes/shot_07-d0e5ac6e7c.jpg",
+      "key": "d0e5ac6e7cab7c7e55fa031e5b473c7cd90724e3967ec12958b5995ba22e3cf8",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Close-up of white milk spreading across packed brown earth beside a fallen aluminium jug, splashes and droplets, warm low sun, shallow depth of field. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 207,
+        "references": {
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_07-1": {
+      "file": "outputs/keyframes/shot_07-1-de6c626516.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_10.jpg",
+        "seconds": 6
+      }
+    },
+    "shot_07-2": {
+      "file": "outputs/keyframes/shot_07-2-966895d10e.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_10b.jpg",
+        "seconds": 6
+      }
+    },
+    "shot_07-3": {
+      "file": "outputs/shots/shot_07-3-clip-bc26a40675.mp4",
+      "produced_by": "Wan 2.2 on Kaggle, from the film-maker's picture",
+      "inputs": {
+        "file": "keyframes/shot_11.jpg",
+        "seconds": 5,
+        "clip_prompt": "The boy runs to the right, laughing and looking back over his shoulder. His mother runs after him with a small stick in her hand, smiling. Dust rises from their feet. The two cows stand still and watch. Natural motion. The camera is still. Faces and clothes stay the same as in the picture.",
+        "clip_frames": 81
+      }
+    },
+    "shot_08": {
+      "file": "outputs/keyframes/shot_08-2a2636c556.jpg",
+      "produced_by": "given by the film-maker",
+      "inputs": {
+        "file": "keyframes/shot_12.jpg"
+      }
+    },
+    "shot_09": {
+      "file": "outputs/keyframes/shot_09-da31e62b06.jpg",
+      "key": "da31e62b06b464bf202bc15d0a8d35d84de08df2354b5037f1bdb095859f5f5e",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Medium close-up of the woman from the reference photo, with her glasses and her white netela, pointing into the distance and shouting, eyebrows high, expressive comic outrage, the netela slipping from her head, warm morning light in the rural courtyard, behind her the aluminium milk jug lying on its side in a puddle of spilt milk. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. The mother is the woman in the reference photo. Keep her face, her glasses, and her clothes: a white netela shawl with a blue border over her head, and a light habesha kemis dress with a blue floral pattern and blue trim. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 209,
+        "references": {
+          "mother": "779c1021eb3fa600e0ea32b431c3ec0de464f77449486d4b3722b5ee31a0e2b2",
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_10": {
+      "file": "outputs/keyframes/shot_10-2694962462.jpg",
+      "key": "2694962462640811a81eb5d19324ef0dca081b26a9f1e2d69c58c18bbe376498",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Full shot of the woman from the reference photo, with her glasses and her white netela, running across the rural courtyard holding a small wooden stick in one hand, the netela flowing behind her, laughing as she runs, dust at her feet, the aluminium milk jug lying on its side on the ground in the foreground. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. The mother is the woman in the reference photo. Keep her face, her glasses, and her clothes: a white netela shawl with a blue border over her head, and a light habesha kemis dress with a blue floral pattern and blue trim. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 210,
+        "references": {
+          "mother": "779c1021eb3fa600e0ea32b431c3ec0de464f77449486d4b3722b5ee31a0e2b2",
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_11": {
+      "file": "outputs/keyframes/shot_11-126fa1316c.jpg",
+      "key": "126fa1316ce52951b27978bc40e4e773671e478c1a64d337f6f4c174c02d89eb",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Full shot of the six-year-old boy with the face of the child in the reference photo, in the red and black striped polo shirt and blue shorts, sprinting across the rural courtyard away from the camera, looking back over his shoulder and laughing, dust behind his feet, the two Zebu cows watching him, the aluminium milk jug lying on its side on the ground in the background, no upright containers. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. The boy is the child in the reference photo, shown here at six years old. Keep his face and his short black hair, and dress him in his red and black striped polo shirt with blue shorts. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 211,
+        "references": {
+          "boy": "9154b99b912d33650a29ac7ffcde4ddf51ec675f369b14a444b4112ab9de7372",
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    },
+    "shot_12": {
+      "file": "outputs/keyframes/shot_12-65391b82ca.jpg",
+      "key": "65391b82ca6a0f5df7145d146c356c2fce3b9775450962e8e6e13e9bdb37624a",
+      "produced_by": "@cf/black-forest-labs/flux-2-klein-4b",
+      "inputs": {
+        "model": "@cf/black-forest-labs/flux-2-klein-4b",
+        "prompt": "Medium wide shot in the rural courtyard in golden morning light. The woman from the reference photo, with her glasses and her white netela, stands in the centre of the frame with the small wooden stick lowered, laughing. The six-year-old boy with the face of the child in the reference photo, in the red and black striped polo shirt, stands close beside her on the right, grinning. The two Zebu cows are nearby. The aluminium milk jug lies on its side on the ground at her feet, with white spilt milk spread over the earth. Photorealistic live-action film still, shot on a 35mm cinema camera, natural skin tones, warm golden morning sunlight, soft shadows, shallow depth of field, true-to-life details of the Ethiopian countryside, natural colours, professional film quality. No text, no captions, no watermark, no cartoon. The mother is the woman in the reference photo. Keep her face, her glasses, and her clothes: a white netela shawl with a blue border over her head, and a light habesha kemis dress with a blue floral pattern and blue trim. The boy is the child in the reference photo, shown here at six years old. Keep his face and his short black hair, and dress him in his red and black striped polo shirt with blue shorts. Location reference: a traditional Ethiopian rural homestead. A round mud-walled house with a thatched grass roof, a courtyard of packed earth, a wooden gate, two Zebu cows with large horns, a battered aluminium milk jug, eucalyptus trees and green hills behind. The same place in every scene",
+        "width": 1280,
+        "height": 1280,
+        "steps": 8,
+        "seed": 212,
+        "references": {
+          "mother": "779c1021eb3fa600e0ea32b431c3ec0de464f77449486d4b3722b5ee31a0e2b2",
+          "boy": "9154b99b912d33650a29ac7ffcde4ddf51ec675f369b14a444b4112ab9de7372",
+          "home": "0dd890ab430fce1e068b2a3a2fe1230b1e64043a1be16e262f929d80305dd390"
+        }
+      }
+    }
+  },
+  "narration": {
+    "shot_01": {
+      "file": "outputs/narration/shot_01-0c02de7aa7.wav",
+      "key": "8bcd022beb44b00a9fa1cd368f3e19bf678f19cbcadc7ced5f167af3b26af5b7",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "አሁን የምነግራችሁ ታሪክ በልጅነቴ ከእናቴ ጋር የገጠመኝ አንድ አስቂኝ ገጠመኝ ነው። ያኔ የስድስት ዓመት ልጅ ነበርኩ። ገጠራማ አካባቢ ነበር የምንኖረው። ሁለት የሚታለቡ ላሞች ነበሩን። እናቴ በየቀኑ ማለዳ ተነስታ ታልባቸው ነበር።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_02": {
+      "file": "outputs/narration/shot_02-5d72805ccb.wav",
+      "key": "a1ed5780cca88212cb6c492a2a9fc37eb1264230d317a09ac739bf6394644f5c",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እኔ ደግሞ እናቴ ላሞቹን ስታልብ ማየት እና ያለበችውን ትኩስ ወተት መጠጣት በጣም ያስደስተኝ ነበር።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_03": {
+      "file": "outputs/narration/shot_03-3ce9ecc35e.wav",
+      "key": "95766c47325fa05bf72a25f7631b44bc258d9d5309a9018e127c12a2a7cf2dd6",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "ታዲያ አንድ ቀን ጠዋት እናቴ ያለበችውን ወተት በቅል ዕቃ ሞልታ በሩ አካባቢ አስቀምጣው ነበር።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_04": {
+      "file": "outputs/narration/shot_04-244f89aa2a.wav",
+      "key": "1f2f78757543e1c6c79f82cb1308d8fc1b60a1e5a63b883f2c2df4b8c5896af4",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እኔም በጠዋት ከጓደኞቸ ጋር ትንሽ ተጫዉቸ ስጨርስ ወደ ቤት በሩጫ መጣሁ። ቤት ውስጥ ለመግባት ስል፣ በሩ አካባቢ የተቀመጠውን የወተት ቅል ሳላየው በእግሬ ገጭቼ ገለበጥኩት።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_05": {
+      "file": "outputs/narration/shot_05-6b3be8d5c9.wav",
+      "key": "1e27a0c1497a8543e173b3a33f949ad75bbae14049f01b1dd9edb38de683dc04",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "ወተቱ አንድ ጠብታ ሳይቀር መሬት ላይ ፈሰሰ። እኔም ደንግጬ ወዲያው ወደ እናቴ ተመለከትኩ።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_06": {
+      "file": "outputs/narration/shot_06-7de7dd96bc.wav",
+      "key": "1e4b8ede542e68a03e32bd24b170f11004332136f4a65b5f30f5ea6df946f22e",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እናቴ ሁሌም ስትደነግጥ የምትለው ነገር አላት። ያን ቀንም እንደተለመደው፣ «<shout> የናዝሬቱ ኢየሱስ!» ብላ ጮኸች።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_07": {
+      "file": "outputs/narration/shot_07-84383c0ee8.wav",
+      "key": "aed61f4a2e54850a133b97d17cea35024077348128fca08802fba5a9ddee729e",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እናቴ እኔ አለመጎዳቴን ካረጋገጠች በኋላ ዱላ አንስታ ወደኔ መምጣት ጀመረች። ነገሩ ነገሩ ወዴት እያመራ እንደሆነ ሲገባኝ ። እኔም ተነስቸ እግሬ አውጪኝ ብዬ መሮጥ ጀመርኩ። ያን ቀን እንደሮጥኩት ሮጬ አላውቅም። ላሞቻችንም ቆመው ትርኢታችንን ይመለከቱ ነበር።",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_08": {
+      "file": "outputs/narration/shot_08-8137f7ef61.wav",
+      "key": "12d07fe319e09a91835e319bdb6aea113e1b342286e21041babf2b1c3cc89a93",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "ያን ቀን ወተቱም ፈሰሰ እኔም እንደዛ የሮጥኩለትን ወተት ሳልጠጣ ዋልኩኝ። እናቴም \"የቸኮለች አፍስሳ ለቀመች\" ብላ የሁልዜ ተረቷን ተረትች ። ለእኔ እና ለናቴም እስከዛሬ ድረስ የሚያስቀን ትዝታ ሆኖ ቀረ። እማዬ፣ በጣም እወድሻለሁ!",
+        "voice": "Charon",
+        "style": ""
+      }
+    },
+    "shot_09": {
+      "file": "outputs/narration/shot_09-44f2b03fad.wav",
+      "key": "44f2b03fad0bfc842dd8c08aa795eae472c8203708a3c51f621d1fcc35286d4c",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "ከዚያም ድምፇን ከፍ አድርጋ፦ «የናዝሬቱ ኢየሱስ!» ብላ ጮኸች።",
+        "voice": "Charon",
+        "style": "a man telling a funny family memory to relatives: warm, smiling, a little theatrical"
+      }
+    },
+    "shot_10": {
+      "file": "outputs/narration/shot_10-bd92f24fc7.wav",
+      "key": "bd92f24fc7db03058ba86dca9cacd43fc1c8add82ab857212e1af125a4db0ca9",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እንጨት ዱላ ወስዳ ለማሳደዴ ተነሳች። ግን እሷም እየሳቀች ነበር።",
+        "voice": "Charon",
+        "style": "a man telling a funny family memory to relatives: warm, smiling, a little theatrical"
+      }
+    },
+    "shot_11": {
+      "file": "outputs/narration/shot_11-c62d96f9b7.wav",
+      "key": "c62d96f9b7e7595e9edd091f15734d403afe4bb1cdc34b30e34ad24691114584",
+      "produced_by": "gemini-3.8-flash-tts",
+      "inputs": {
+        "model": "gemini-3.8-flash-tts",
+        "text": "እኔ ደግሞ እየሳቅሁ ሸሸሁ። ላሞቹ ሁለቱም ያዉን ተመልከቱ።",
+        "voice": "Charon",
+        "style": "a man telling a funny family memory to relatives: warm, smiling, a little theatrical"
+      }
+    }
+  }
+}
