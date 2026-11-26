@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from . import assemble, audio_check, cache, config, costs, ffmpeg, keyframes, music, narration, smoke
+from . import assemble, audio_check, cache, config, costs, ffmpeg, keyframes, music, narration, shots, smoke
 from .providers import ProviderError
 from .retry import TransientError
 from .runlog import redact
@@ -82,6 +82,20 @@ def cmd_music(args: argparse.Namespace) -> int:
     return 0 if music.run(storyboard, settings, mock=args.mock) else 1
 
 
+def cmd_shots(args: argparse.Namespace) -> int:
+    if args.action == "import":
+        if not args.source:
+            raise SystemExit("Name the file to import. For example: python -m pipeline shots import clips.zip")
+        shots.import_results(Path(args.source))
+        return 0
+    storyboard, settings = _load(args)
+    if args.action == "export":
+        say(f"The job for Kaggle is written: {cache.relative(shots.export(storyboard, settings, smoke=args.smoke))}")
+        return 0
+    shots.run(storyboard, settings)
+    return 0
+
+
 def cmd_radio(args: argparse.Namespace) -> int:
     storyboard, settings = _load(args)
     # A first listen is worth making even when the speech service refuses a line
@@ -145,6 +159,13 @@ def build_parser() -> argparse.ArgumentParser:
     score.add_argument("--smoke", action="store_true", help="with export: a 15-second test instead of the real score")
     _mock_option(score)
     score.set_defaults(handler=cmd_music)
+
+    clip = commands.add_parser("shots", help="the moving shots: which clips exist, the job that makes them on Kaggle, and the import of the results")
+    clip.add_argument("action", nargs="?", default="make", choices=["make", "export", "import"])
+    clip.add_argument("source", nargs="?", help="for import: the clips.zip downloaded from Kaggle")
+    clip.add_argument("--smoke", action="store_true", help="with export: a tiny clip of nine frames, to learn whether the model runs there at all")
+    _mock_option(clip)
+    clip.set_defaults(handler=cmd_shots)
 
     radio = commands.add_parser("radio", help="narration over a placeholder score, on a black screen")
     radio.add_argument("--force", action="store_true", help="make everything again, even what is already made")

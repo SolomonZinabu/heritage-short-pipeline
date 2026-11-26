@@ -1,0 +1,63 @@
+{
+  "gpu": "Tesla T4",
+  "session_seconds": 767,
+  "patches_for_the_t4": [
+    [
+      "wan/configs/shared_config.py",
+      "wan_shared_cfg.param_dtype = torch.bfloat16",
+      "wan_shared_cfg.param_dtype = torch.float16"
+    ],
+    [
+      "wan/modules/attention.py",
+      "dtype=torch.bfloat16,",
+      "dtype=torch.float16,"
+    ],
+    [
+      "wan/textimage2video.py",
+      "WanModel.from_pretrained(checkpoint_dir)",
+      "WanModel.from_pretrained(checkpoint_dir, torch_dtype=self.param_dtype)"
+    ]
+  ],
+  "results": [],
+  "tasks": [
+    {
+      "id": "smoke",
+      "model": "wan2.2-ti2v-5b",
+      "image": "keyframes/shot_03.jpg",
+      "image_sha256": "2066d29bfdf461c5b250e4a2b87fb07d87a28eb648845605114bc4cf8a2de08e",
+      "prompt": "The mother's hands squeeze the cow's udder and a thin stream of milk falls into the steel basin. The little boy crouches beside her and watches with a smile, his head moving slightly. The cow's ear twitches. Natural, gentle motion. The camera is still. Faces and clothes stay the same as in the picture.",
+      "frames": 9,
+      "steps": 4,
+      "seed": 202,
+      "size": "704*1280",
+      "cache": "77b82a61b1eabe94f4f3bc6bcaf89ab4fbc60c52f2a3cf0de815e2b03b77f5be",
+      "file": "smoke-clip-77b82a61b1.mp4"
+    },
+    {
+      "id": "shot_02",
+      "model": "wan2.2-ti2v-5b",
+      "image": "keyframes/shot_03.jpg",
+      "image_sha256": "2066d29bfdf461c5b250e4a2b87fb07d87a28eb648845605114bc4cf8a2de08e",
+      "prompt": "The mother's hands squeeze the cow's udder and a thin stream of milk falls into the steel basin. The little boy crouches beside her and watches with a smile, his head moving slightly. The cow's ear twitches. Natural, gentle motion. The camera is still. Faces and clothes stay the same as in the picture.",
+      "frames": 49,
+      "steps": 30,
+      "seed": 202,
+      "size": "704*1280",
+      "cache": "bfe253a4739df831d55cb7865d098840ef3d7fe7b7c099253e345d23ca6be9c4",
+      "file": "shot_02-clip-bfe253a473.mp4"
+    },
+    {
+      "id": "shot_07-3",
+      "model": "wan2.2-ti2v-5b",
+      "image": "keyframes/shot_11.jpg",
+      "image_sha256": "ca70ecb1a1eb5f1f8b063613572274302f1c8e3da2ece0edb4e72f9cbf9fe64a",
+      "prompt": "The boy runs to the right, laughing and looking back over his shoulder. His mother runs after him with a small stick in her hand, smiling. Dust rises from their feet. The two cows stand still and watch. Natural motion. The camera is still. Faces and clothes stay the same as in the picture.",
+      "frames": 81,
+      "steps": 30,
+      "seed": 207,
+      "size": "1280*704",
+      "cache": "bc26a4067505f7c8fab80caff4e9afa1bb1f089c862000a14e2c47209afd022a",
+      "file": "shot_07-3-clip-bc26a40675.mp4"
+    }
+  ]
+}

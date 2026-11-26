@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,7 @@ from .validate_storyboard import FILM_SECONDS
 STAGE = "assembly"
 # Raised whenever the edit itself changes, so that a film made by an older edit
 # is never mistaken for a current one.
-EDIT_VERSION = 7
+EDIT_VERSION = 8
 AUDIO_RATE = 48000
 # Each aspect ratio, and the storyboard setting that holds its size.
 RATIOS = {"9x16": "vertical", "16x9": "horizontal"}
@@ -97,7 +98,9 @@ def _shares(shot: dict[str, Any], frames: int) -> list[int]:
     return shares
 
 
-def _travel(across: int, down: int, width: int, height: int, frames: int, fps: int, focus: tuple[float, float]) -> str | None:
+def _travel(
+    across: int, down: int, width: int, height: int, frames: int, fps: int, focus: tuple[float, float], seconds: float | None = None
+) -> str | None:
     """A slow move across a picture whose shape differs greatly from the frame's.
 
     A tall picture in a wide frame is looked at through a window of the frame's
@@ -107,6 +110,10 @@ def _travel(across: int, down: int, width: int, height: int, frames: int, fps: i
     backdrop would fill most of the frame with blur. The window starts and ends
     well inside the picture, around ``focus``. ``None`` when the shapes are
     close enough for the frame simply to be filled.
+
+    ``seconds`` is given for a clip, which moves by itself. The window then
+    crosses it once, in the clip's own length, and stays on the end while the
+    last frame is held.
     """
     picture, frame = across / down, width / height
     if picture / frame >= 0.75 and frame / picture >= 0.6:
@@ -119,6 +126,12 @@ def _travel(across: int, down: int, width: int, height: int, frames: int, fps: i
     span = f"(ih-{2 * height})" if tall else f"(iw-{2 * width})"
     centre = focus[1] if tall else focus[0]
     start, end = max(0.0, min(1.0, centre) - 0.4), min(1.0, max(0.0, centre) + 0.4)
+    if seconds is not None:
+        place = f"'{span}*({start:.3f}+{end - start:.3f}*min(1,t/{max(seconds, 0.1):.3f}))'"
+        return (
+            f"{scale},setsar=1,crop={window}:{place if not tall else 0}:{place if tall else 0},"
+            f"scale={width}:{height}:flags=lanczos,setsar=1"
+        )
     moment = "0" if frames < 2 else f"(n/{frames - 1})"
     place = f"'{span}*({start:.3f}+{end - start:.3f}*{moment})'"
     # One picture is repeated into as many frames as the shot has, each at its
@@ -259,14 +272,19 @@ def segment(
     pad = _pad_to(duration, fps)
     inputs = ["-i", str(source)]
     if kind == "clip":
-        if fit != "blur":
-            graph = f"[0:v]{_cover(width, height, focus)},setsar=1{pad},format=yuv420p[vout]"
-        else:
+        if fit == "blur":
             whole = f"scale={width}:{height}:force_original_aspect_ratio=decrease,setsar=1"
             graph = (
                 f"[0:v]split=2[bg][fg];[bg]{_blurred_backdrop(width, height)}{pad}[b];[fg]{whole}{pad}[f];"
                 f"[b][f]overlay=(W-w)/2:(H-h)/2:shortest=1,format=yuv420p[vout]"
             )
+        else:
+            across, down = _frame_size(source)
+            moving = _travel(across, down, width, height, frames, fps, focus, seconds=ffmpeg.duration_seconds(source)) if fit == "auto" else None
+            if moving:
+                graph = f"[0:v]{moving}{pad},format=yuv420p[vout]"
+            else:
+                graph = f"[0:v]{_cover(width, height, focus)},setsar=1{pad},format=yuv420p[vout]"
     elif fit == "blur":
         with Image.open(source) as image:
             source_width, source_height = image.size
@@ -370,18 +388,63 @@ def mix_audio(
             f"[0:a]{_stereo()},atrim=duration={total:.3f},asetpts=PTS-STARTPTS,volume={settings['assembly']['music_gain']},"
             f"afade=t=in:st=0:d=1.5,afade=t=out:st={total - fade_out:.3f}:d={fade_out}[score]"
         )
+        # The voice goes to two places. It presses down the score, and it is
+        # heard in the film. Each takes its own copy of the stream. Handed to
+        # both filters at once, the copy that was to be heard was lost, and the
+        # first finished film had music and no narrator.
+        graph.append("[voice]asplit=2[pressing][heard]")
         graph.append(
-            f"[score][voice]sidechaincompress=threshold={duck['threshold']}:ratio={duck['ratio']}:"
+            f"[score][pressing]sidechaincompress=threshold={duck['threshold']}:ratio={duck['ratio']}:"
             f"attack={duck['attack']}:release={duck['release']}[ducked]"
         )
-        graph.append("[ducked][voice]amix=inputs=2:normalize=0[mix]")
+        graph.append("[ducked][heard]amix=inputs=2:normalize=0[mix]")
 
     # The stop time is a guard: whatever happens in the graph, the file ends with the film.
     _render(
         out_wav,
         [*inputs, "-filter_complex", ";".join(graph), "-map", "[mix]", "-t", f"{total:.3f}", "-c:a", "pcm_s16le", "-ar", str(AUDIO_RATE)],
     )
+    if not _voice_is_heard(out_wav, narration, cuts):
+        raise ffmpeg.FFmpegError("the mixed sound does not hold the narrator's voice: it was looked for where the first line is spoken, and is not there")
     return out_wav
+
+
+def _window(path: Path, start: float, seconds: float) -> list[float]:
+    """A short piece of a sound file, as one channel of numbers."""
+    done = subprocess.run(
+        [ffmpeg.ffmpeg_path(), "-v", "error", "-ss", f"{start:.3f}", "-t", f"{seconds:.3f}", "-i", str(path), "-ac", "1", "-ar", "8000", "-f", "s16le", "-"],
+        capture_output=True,
+        check=True,
+    )
+    raw = done.stdout
+    return [int.from_bytes(raw[i:i + 2], "little", signed=True) / 32768 for i in range(0, len(raw) - 1, 2)]
+
+
+def _alike(first: list[float], second: list[float]) -> float:
+    """How alike two pieces of sound are: 0 when they have nothing in common, 1 when they are the same."""
+    if len(first) < 2 or len(first) != len(second):
+        return 0.0
+    mean_first, mean_second = sum(first) / len(first), sum(second) / len(second)
+    shared = sum((x - mean_first) * (y - mean_second) for x, y in zip(first, second))
+    spread_first = math.sqrt(sum((x - mean_first) ** 2 for x in first))
+    spread_second = math.sqrt(sum((y - mean_second) ** 2 for y in second))
+    return shared / (spread_first * spread_second) if spread_first and spread_second else 0.0
+
+
+def _voice_is_heard(mix: Path, narration: dict[str, Path], cuts: list[timeline.Cut]) -> bool:
+    """Whether the narrator can be heard in the mixed sound.
+
+    The first line is looked for in the mix, at the moment where it should be
+    speaking. A mix that holds only the score sounds finished and is not, and
+    nothing else shows it.
+    """
+    for cut in cuts:
+        wav = narration.get(cut.shot_id)
+        if wav is None:
+            continue
+        seconds = min(2.0, cut.speech_seconds)
+        return _alike(_window(mix, cut.speech_start, seconds), _window(wav, 0, seconds)) >= 0.5
+    return False
 
 
 def _loudness_filter(settings: dict[str, Any], measured: dict[str, float] | None = None) -> str:
@@ -526,11 +589,13 @@ def film(
         else:
             sources, kind = [None], "black"
         for number, source in enumerate(sources):
+            # A clip is told by its file name, so that a shot can mix stills and clips.
+            kind_here = "clip" if source is not None and source.suffix.lower() in (".mp4", ".mov", ".webm", ".mkv") else kind
             pieces.append(
                 {
                     "shot": shot["id"],
                     "number": number,
-                    "kind": kind,
+                    "kind": kind_here,
                     "source": source,
                     "hash": cache.file_hash(source) if source else None,
                     "move": _move(shot, index),

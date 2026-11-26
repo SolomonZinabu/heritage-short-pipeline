@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from . import cache, media
+from . import cache, media, shots
 from .config import OUTPUTS, ROOT, private
 from .providers import cloudflare_flux
 from .retry import with_retries
@@ -256,6 +256,14 @@ def run(
             paths = []
             for number, still in enumerate(shot["stills"], start=1):
                 label = shot["id"] if len(shot["stills"]) == 1 else f"{shot['id']}-{number}"
+                # A still that asked for a clip is shown as that clip, once the clip exists.
+                clip = shots.clip_for(still, label, shot["seed"], settings)
+                if clip is not None:
+                    say(f"{label:<12}clip        reused      {clip.name}")
+                    paths.append(clip)
+                    if manifest is not None:
+                        manifest.record(STAGE, label, {"file": str(clip), "produced_by": "Wan 2.2 on Kaggle, from the film-maker's picture", "inputs": still})
+                    continue
                 path = from_still(still, label)
                 say(f"{label:<12}still       given       {path.name}")
                 paths.append(path)
